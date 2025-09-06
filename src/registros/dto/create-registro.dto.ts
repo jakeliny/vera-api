@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ErrorMessages } from '../../common/enums/error-messages.enum';
 
 export const CreateRegistroSchema = z.object({
@@ -48,3 +49,53 @@ export const UpdateRegistroSchema = z.object({
 
 export type CreateRegistroDto = z.infer<typeof CreateRegistroSchema>;
 export type UpdateRegistroDto = z.infer<typeof UpdateRegistroSchema>;
+
+export class CreateRegistroSwaggerDto {
+  @ApiProperty({
+    description: 'Employee admission date in YYYY-MM-DD format',
+    example: '2023-01-15',
+    pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+  })
+  admissionDate: string;
+
+  @ApiProperty({
+    description: 'Employee base salary (minimum 1300, maximum 100,000)',
+    example: 5000,
+    minimum: 1300,
+    maximum: 100000,
+  })
+  salary: number;
+
+  @ApiProperty({
+    description: 'Employee name (1-30 characters)',
+    example: 'João Silva',
+    minLength: 1,
+    maxLength: 30,
+  })
+  employee: string;
+}
+
+export class UpdateRegistroSwaggerDto {
+  @ApiPropertyOptional({
+    description: 'Employee admission date in YYYY-MM-DD format',
+    example: '2023-01-15',
+    pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+  })
+  admissionDate?: string;
+
+  @ApiPropertyOptional({
+    description: 'Employee base salary (minimum 1300, maximum 100,000)',
+    example: 6000,
+    minimum: 1300,
+    maximum: 100000,
+  })
+  salary?: number;
+
+  @ApiPropertyOptional({
+    description: 'Employee name (1-30 characters)',
+    example: 'Maria Santos',
+    minLength: 1,
+    maxLength: 30,
+  })
+  employee?: string;
+}
