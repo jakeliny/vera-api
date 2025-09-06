@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RegistrosService } from './registros.service';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
 import { Registro } from './entities/registro.entity';
-import { CreateRegistroDto } from './dto/create-registro.dto';
+import {
+  CreateRegistroDto,
+  UpdateRegistroDto,
+} from './dto/create-registro.dto';
 import { RegistroFilters } from './dto/filter-registro.dto';
 
 describe('RegistrosService', () => {
@@ -186,8 +189,17 @@ describe('RegistrosService', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update registro and recalculate salary when salary is updated', async () => {
+  describe('patch', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2024-01-20'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should patch registro and recalculate salary when salary is updated', async () => {
       const existingRegistro = new Registro(
         '2024-01-15',
         5000,
@@ -195,7 +207,7 @@ describe('RegistrosService', () => {
         'John Doe',
         'test-id',
       );
-      const updateData = { salary: 6000 };
+      const updateData: UpdateRegistroDto = { salary: 6000 };
       const updatedRegistro = {
         ...existingRegistro,
         salary: 6000,
@@ -205,11 +217,48 @@ describe('RegistrosService', () => {
       jest.spyOn(repository, 'getById').mockResolvedValue(existingRegistro);
       jest.spyOn(repository, 'put').mockResolvedValue(updatedRegistro);
 
-      const [error, result] = await service.update('test-id', updateData);
+      const [error, result] = await service.patch('test-id', updateData);
 
       expect(error).toBeNull();
-      expect(result).toEqual(updatedRegistro);
+      expect(result).toEqual(
+        expect.objectContaining({
+          ...updatedRegistro,
+          calculatedAdmissionDate: '5 days',
+        }),
+      );
       expect(repository.put).toHaveBeenCalledWith('test-id', {
+        salary: 6000,
+        calculatedSalary: 2100,
+      });
+    });
+
+    it('should only update allowed fields', async () => {
+      const existingRegistro = new Registro(
+        '2024-01-15',
+        5000,
+        1750,
+        'John Doe',
+        'test-id',
+      );
+      const updateData = {
+        employee: 'New Name',
+        salary: 6000,
+        calculatedSalary: 9999, // This should be filtered out
+        id: 'new-id', // This should be filtered out
+      } as any;
+
+      jest.spyOn(repository, 'getById').mockResolvedValue(existingRegistro);
+      jest.spyOn(repository, 'put').mockResolvedValue({
+        ...existingRegistro,
+        employee: 'New Name',
+        salary: 6000,
+        calculatedSalary: 2100,
+      });
+
+      await service.patch('test-id', updateData);
+
+      expect(repository.put).toHaveBeenCalledWith('test-id', {
+        employee: 'New Name',
         salary: 6000,
         calculatedSalary: 2100,
       });
@@ -218,7 +267,7 @@ describe('RegistrosService', () => {
     it('should return error when registro not found', async () => {
       jest.spyOn(repository, 'getById').mockResolvedValue(null);
 
-      const [error, result] = await service.update('non-existent-id', {
+      const [error, result] = await service.patch('non-existent-id', {
         employee: 'New Name',
       });
 

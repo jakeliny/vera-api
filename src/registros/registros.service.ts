@@ -64,7 +64,7 @@ export class RegistrosService {
     return [null, registroWithCalculatedDate] as [null, Registro];
   }
 
-  async update(
+  async patch(
     id: string,
     updateData: UpdateRegistroDto,
   ): Promise<[Error, null] | [null, Registro]> {
@@ -74,14 +74,25 @@ export class RegistrosService {
       return [new Error('Registro not found'), null];
     }
 
+    const allowedFields = ['employee', 'salary', 'admissionDate'];
+    const filteredUpdateData = Object.keys(updateData)
+      .filter((key) => allowedFields.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = updateData[key as keyof UpdateRegistroDto];
+        return obj;
+      }, {} as any);
+
     let calculatedSalary = existingRegistro.calculatedSalary;
 
-    if (updateData.salary) {
-      calculatedSalary = this.calculateSalaryPercentage(updateData.salary, 35);
+    if (filteredUpdateData.salary) {
+      calculatedSalary = SalaryUtils.calculateSalaryPercentage(
+        filteredUpdateData.salary,
+        35,
+      );
     }
 
     const updatedRegistro = await this.registrosRepository.put(id, {
-      ...updateData,
+      ...filteredUpdateData,
       calculatedSalary,
     });
 
@@ -89,8 +100,16 @@ export class RegistrosService {
       return [new Error('Failed to update registro'), null];
     }
 
-    return [null, updatedRegistro] as [null, Registro];
+    const registroWithCalculatedDate = {
+      ...updatedRegistro,
+      calculatedAdmissionDate: DateUtils.calculateElapsedTime(
+        updatedRegistro.admissionDate,
+      ),
+    };
+
+    return [null, registroWithCalculatedDate] as [null, Registro];
   }
+
   async remove(id: string): Promise<[Error, null] | [null, boolean]> {
     const deleted = await this.registrosRepository.delete(id);
 

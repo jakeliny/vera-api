@@ -5,7 +5,7 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
+  Patch,
   Res,
   Query,
 } from '@nestjs/common';
@@ -65,13 +65,13 @@ export class RegistrosController {
     return res.status(HttpStatus.OK).json(registro);
   }
 
-  @Put(':id')
-  async update(
+  @Patch(':id')
+  async patch(
     @Param('id') id: string,
     @ZodBody(UpdateRegistroSchema) updateRegistroDto: UpdateRegistroDto,
     @Res() res: Response,
   ) {
-    const [error, registro] = await this.registrosService.Put(
+    const [error, registro] = await this.registrosService.patch(
       id,
       updateRegistroDto,
     );

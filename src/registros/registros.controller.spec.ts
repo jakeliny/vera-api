@@ -13,7 +13,7 @@ describe('RegistrosController', () => {
     create: jest.fn(),
     findAll: jest.fn(),
     findOne: jest.fn(),
-    update: jest.fn(),
+    patch: jest.fn(),
     remove: jest.fn(),
   };
 
@@ -135,9 +135,9 @@ describe('RegistrosController', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update registro and return 200', async () => {
-      const updateData = { salary: 6000 };
+  describe('patch', () => {
+    it('should patch registro and return 200', async () => {
+      const patchData = { salary: 6000 };
       const updatedRegistro = new Registro(
         '2024-01-15',
         6000,
@@ -146,27 +146,21 @@ describe('RegistrosController', () => {
         'test-id',
       );
 
-      jest.spyOn(service, 'update').mockResolvedValue([null, updatedRegistro]);
+      jest.spyOn(service, 'patch').mockResolvedValue([null, updatedRegistro]);
 
-      await controller.update('test-id', updateData, mockResponse);
+      await controller.patch('test-id', patchData, mockResponse);
 
-      expect(service.update).toHaveBeenCalledWith('test-id', updateData);
+      expect(service.patch).toHaveBeenCalledWith('test-id', patchData);
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockResponse.json).toHaveBeenCalledWith(updatedRegistro);
     });
 
-    it('should return 404 when registro not found for update', async () => {
+    it('should throw error when registro not found for patch', async () => {
       const error = new Error('Registro not found');
-      jest.spyOn(service, 'update').mockResolvedValue([error, null]);
-
-      await controller.update(
-        'non-existent-id',
-        { salary: 6000 },
-        mockResponse,
-      );
+      jest.spyOn(service, 'patch').mockResolvedValue([error, null]);
 
       await expect(
-        controller.remove('non-existent-id', mockResponse),
+        controller.patch('non-existent-id', { salary: 6000 }, mockResponse),
       ).rejects.toThrow('Registro not found');
     });
   });
