@@ -8,6 +8,7 @@ import { IRegistrosRepository } from './interfaces/registros-repository.interfac
 import { DateUtils } from '../common/utils/date.utils';
 import { RegistroFilters } from './dto/filter-registro.dto';
 import { SalaryUtils } from '../common/utils/salary.utils';
+import { ErrorMessages } from '../common/enums/error-messages.enum';
 
 @Injectable()
 export class RegistrosService {
@@ -51,7 +52,7 @@ export class RegistrosService {
     const registro = await this.registrosRepository.getById(id);
 
     if (!registro) {
-      return [new Error('Registro not found'), null];
+      return [new Error(ErrorMessages.REGISTRO_NOT_FOUND), null];
     }
 
     const registroWithCalculatedDate = {
@@ -71,7 +72,7 @@ export class RegistrosService {
     const existingRegistro = await this.registrosRepository.getById(id);
 
     if (!existingRegistro) {
-      return [new Error('Registro not found'), null];
+      return [new Error(ErrorMessages.REGISTRO_NOT_FOUND), null];
     }
 
     const allowedFields = ['employee', 'salary', 'admissionDate'];
@@ -97,7 +98,7 @@ export class RegistrosService {
     });
 
     if (!updatedRegistro) {
-      return [new Error('Failed to update registro'), null];
+      return [new Error(ErrorMessages.FAILED_TO_UPDATE_REGISTRO), null];
     }
 
     const registroWithCalculatedDate = {
@@ -114,7 +115,7 @@ export class RegistrosService {
     const deleted = await this.registrosRepository.delete(id);
 
     if (!deleted) {
-      return [new Error('Registro not found'), null];
+      return [new Error(ErrorMessages.REGISTRO_NOT_FOUND), null];
     }
 
     return [null, deleted] as [null, boolean];

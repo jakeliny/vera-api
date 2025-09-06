@@ -7,6 +7,10 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ZodError } from 'zod';
+import {
+  ErrorMessages,
+  ERROR_TRANSLATIONS,
+} from '../enums/error-messages.enum';
 
 export interface ErrorResponse {
   status: number;
@@ -24,7 +28,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const timeStamp = now.toISOString().replace('T', ' ').substring(0, 19);
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Erro interno do servidor';
+    let message = String(
+      ERROR_TRANSLATIONS[ErrorMessages.INTERNAL_SERVER_ERROR],
+    );
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -52,7 +58,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof Error) {
       message = this.translateMessage(exception.message);
 
-      if (exception.message === 'Registro not found') {
+      if (exception.message === ErrorMessages.REGISTRO_NOT_FOUND) {
         status = HttpStatus.NOT_FOUND;
       } else {
         status = HttpStatus.BAD_REQUEST;
@@ -69,29 +75,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   }
 
   private translateMessage(message: string): string {
-    const translations: Record<string, string> = {
-      'Registro not found': 'Registro não encontrado',
-      'Failed to update registro': 'Falha ao atualizar registro',
-      'Salary must be positive': 'Salário deve ser um número positivo',
-      'Salary must be at least 1300': 'Salário deve ser no mínimo 1300',
-      'Salary cannot exceed 100,000': 'Salário não pode exceder 100.000',
-      'Employee name is required': 'Nome do funcionário é obrigatório',
-      'Employee name cannot exceed 30 characters':
-        'Nome do funcionário não pode exceder 30 caracteres',
-      'Date must be in YYYY-MM-DD format':
-        'Data deve estar no formato AAAA-MM-DD',
-      'Admission date cannot be in the future':
-        'Data de admissão não pode ser no futuro',
-      'Validation failed': 'Falha na validação',
-      'ID must be a valid UUID': 'ID deve ser um UUID válido',
-      'Calculated salary must be positive':
-        'Salário calculado deve ser um número positivo',
-    };
-
-    return translations[message] || message;
+    const errorMessage = message as ErrorMessages;
+    const translation = ERROR_TRANSLATIONS[errorMessage];
+    return translation ? String(translation) : message;
   }
 
   private translateZodError(error: any): string {
-    return this.translateMessage(error.message || 'Erro de validação');
+    const errorMessage = error.message || ErrorMessages.VALIDATION_ERROR;
+    return this.translateMessage(String(errorMessage));
   }
 }

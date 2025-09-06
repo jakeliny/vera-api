@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RegistrosService } from './registros.service';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
 import { Registro } from './entities/registro.entity';
+import { ErrorMessages } from '../common/enums/error-messages.enum';
 import {
   CreateRegistroDto,
   UpdateRegistroDto,
@@ -184,7 +185,7 @@ describe('RegistrosService', () => {
       const [error, result] = await service.findOne('non-existent-id');
 
       expect(error).toBeInstanceOf(Error);
-      expect(error?.message).toBe('Registro not found');
+      expect(error?.message).toBe(ErrorMessages.REGISTRO_NOT_FOUND);
       expect(result).toBeNull();
     });
   });
@@ -272,7 +273,7 @@ describe('RegistrosService', () => {
       });
 
       expect(error).toBeInstanceOf(Error);
-      expect(error?.message).toBe('Registro not found');
+      expect(error?.message).toBe(ErrorMessages.REGISTRO_NOT_FOUND);
       expect(result).toBeNull();
     });
   });
@@ -293,7 +294,7 @@ describe('RegistrosService', () => {
       const [error, result] = await service.remove('non-existent-id');
 
       expect(error).toBeInstanceOf(Error);
-      expect(error?.message).toBe('Registro not found');
+      expect(error?.message).toBe(ErrorMessages.REGISTRO_NOT_FOUND);
       expect(result).toBeNull();
     });
   });

@@ -4,6 +4,7 @@ import { RegistrosService } from './registros.service';
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 import { Registro } from './entities/registro.entity';
+import { ErrorMessages } from '../common/enums/error-messages.enum';
 
 describe('RegistrosController', () => {
   let controller: RegistrosController;
@@ -124,12 +125,12 @@ describe('RegistrosController', () => {
     });
 
     it('should throw error when registro not found', async () => {
-      const error = new Error('Registro not found');
+      const error = new Error(ErrorMessages.REGISTRO_NOT_FOUND);
       jest.spyOn(service, 'findOne').mockResolvedValue([error, null]);
 
       await expect(
         controller.findOne('non-existent-id', mockResponse),
-      ).rejects.toThrow('Registro not found');
+      ).rejects.toThrow(ErrorMessages.REGISTRO_NOT_FOUND);
 
       expect(service.findOne).toHaveBeenCalledWith('non-existent-id');
     });
@@ -156,12 +157,12 @@ describe('RegistrosController', () => {
     });
 
     it('should throw error when registro not found for patch', async () => {
-      const error = new Error('Registro not found');
+      const error = new Error(ErrorMessages.REGISTRO_NOT_FOUND);
       jest.spyOn(service, 'patch').mockResolvedValue([error, null]);
 
       await expect(
         controller.patch('non-existent-id', { salary: 6000 }, mockResponse),
-      ).rejects.toThrow('Registro not found');
+      ).rejects.toThrow(ErrorMessages.REGISTRO_NOT_FOUND);
     });
   });
 
@@ -177,12 +178,12 @@ describe('RegistrosController', () => {
     });
 
     it('should throw error when registro not found for deletion', async () => {
-      const error = new Error('Registro not found');
+      const error = new Error(ErrorMessages.REGISTRO_NOT_FOUND);
       jest.spyOn(service, 'remove').mockResolvedValue([error, null]);
 
       await expect(
         controller.remove('non-existent-id', mockResponse),
-      ).rejects.toThrow('Registro not found');
+      ).rejects.toThrow(ErrorMessages.REGISTRO_NOT_FOUND);
     });
   });
 });

@@ -1,47 +1,48 @@
 import { z } from 'zod';
+import { ErrorMessages } from '../../common/enums/error-messages.enum';
 
 export const CreateRegistroSchema = z.object({
   admissionDate: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, ErrorMessages.DATE_FORMAT_INVALID)
     .refine((date) => {
       const inputDate = new Date(date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       return inputDate <= today;
-    }, 'Admission date cannot be in the future'),
+    }, ErrorMessages.ADMISSION_DATE_FUTURE),
   salary: z
     .number()
-    .positive('Salary must be positive')
-    .min(1300, 'Salary must be at least 1300')
-    .max(100000, 'Salary cannot exceed 100,000'),
+    .positive(ErrorMessages.SALARY_MUST_BE_POSITIVE)
+    .min(1300, ErrorMessages.SALARY_MINIMUM)
+    .max(100000, ErrorMessages.SALARY_MAXIMUM),
   employee: z
     .string()
-    .min(1, 'Employee name is required')
-    .max(30, 'Employee name cannot exceed 30 characters'),
+    .min(1, ErrorMessages.EMPLOYEE_NAME_REQUIRED)
+    .max(30, ErrorMessages.EMPLOYEE_NAME_MAX_LENGTH),
 });
 
 export const UpdateRegistroSchema = z.object({
   admissionDate: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, ErrorMessages.DATE_FORMAT_INVALID)
     .refine((date) => {
       const inputDate = new Date(date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       return inputDate <= today;
-    }, 'Admission date cannot be in the future')
+    }, ErrorMessages.ADMISSION_DATE_FUTURE)
     .optional(),
   salary: z
     .number()
-    .positive('Salary must be positive')
-    .min(1300, 'Salary must be at least 1300')
-    .max(100000, 'Salary cannot exceed 100,000')
+    .positive(ErrorMessages.SALARY_MUST_BE_POSITIVE)
+    .min(1300, ErrorMessages.SALARY_MINIMUM)
+    .max(100000, ErrorMessages.SALARY_MAXIMUM)
     .optional(),
   employee: z
     .string()
-    .min(1, 'Employee name is required')
-    .max(30, 'Employee name cannot exceed 30 characters')
+    .min(1, ErrorMessages.EMPLOYEE_NAME_REQUIRED)
+    .max(30, ErrorMessages.EMPLOYEE_NAME_MAX_LENGTH)
     .optional(),
 });
 
