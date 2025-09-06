@@ -3,6 +3,7 @@ import { RegistrosService } from './registros.service';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
 import { Registro } from './entities/registro.entity';
 import { CreateRegistroDto } from './dto/create-registro.dto';
+import { RegistroFilters } from './dto/filter-registro.dto';
 
 describe('RegistrosService', () => {
   let service: RegistrosService;
@@ -40,7 +41,16 @@ describe('RegistrosService', () => {
   });
 
   describe('create', () => {
-    it('should create a registro with calculated salary', async () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2024-01-20'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should create a registro with calculated salary and admission date', async () => {
       const createRegistroDto: CreateRegistroDto = {
         admissionDate: '2024-01-15',
         salary: 5000,
@@ -53,6 +63,7 @@ describe('RegistrosService', () => {
         1750,
         'John Doe',
         'test-id',
+        '5 days',
       );
 
       jest.spyOn(repository, 'insert').mockResolvedValue(expectedRegistro);
@@ -65,6 +76,7 @@ describe('RegistrosService', () => {
           salary: 5000,
           calculatedSalary: 1750,
           employee: 'John Doe',
+          calculatedAdmissionDate: '5 days',
         }),
       );
       expect(result).toEqual(expectedRegistro);
@@ -92,8 +104,57 @@ describe('RegistrosService', () => {
     });
   });
 
+  describe('findAll', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2024-01-20'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should return all registros with calculated admission date', async () => {
+      const registros = [
+        new Registro('2024-01-15', 5000, 1750, 'John Doe', 'test-id-1'),
+        new Registro('2024-01-10', 6000, 2100, 'Jane Smith', 'test-id-2'),
+      ];
+
+      jest.spyOn(repository, 'get').mockResolvedValue(registros);
+
+      const result = await service.findAll();
+
+      expect(repository.get).toHaveBeenCalledWith(undefined);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          ...registros[0],
+          calculatedAdmissionDate: '5 days',
+        }),
+      );
+    });
+
+    it('should pass filters to repository', async () => {
+      const filters: RegistroFilters = { startSalary: 5000, endSalary: 10000 };
+      jest.spyOn(repository, 'get').mockResolvedValue([]);
+
+      await service.findAll(filters);
+
+      expect(repository.get).toHaveBeenCalledWith(filters);
+    });
+  });
+
   describe('findOne', () => {
-    it('should return registro when found', async () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2024-01-20'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should return registro with calculated admission date when found', async () => {
       const registro = new Registro(
         '2024-01-15',
         5000,
@@ -106,7 +167,12 @@ describe('RegistrosService', () => {
       const [error, result] = await service.findOne('test-id');
 
       expect(error).toBeNull();
-      expect(result).toEqual(registro);
+      expect(result).toEqual(
+        expect.objectContaining({
+          ...registro,
+          calculatedAdmissionDate: '5 days',
+        }),
+      );
     });
 
     it('should return error when registro not found', async () => {

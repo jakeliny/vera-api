@@ -5,6 +5,7 @@ import {
 } from './dto/create-registro.dto';
 import { Registro } from './entities/registro.entity';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
+import { RegistroFilters } from './dto/filter-registro.dto';
 
 @Injectable()
 export class RegistrosService {
@@ -29,8 +30,11 @@ export class RegistrosService {
     return this.registrosRepository.insert(registro);
   }
 
-  async findAll(): Promise<Registro[]> {
-    return this.registrosRepository.get();
+  async findAll(filters?: RegistroFilters): Promise<Registro[]> {
+    const registros = await this.registrosRepository.get(filters);
+    return registros.map((registro) => ({
+      ...registro,
+    }));
   }
 
   async findOne(id: string): Promise<[Error, null] | [null, Registro]> {
@@ -42,7 +46,6 @@ export class RegistrosService {
 
     return [null, registro] as [null, Registro];
   }
-
   async update(
     id: string,
     updateData: UpdateRegistroDto,
@@ -70,7 +73,6 @@ export class RegistrosService {
 
     return [null, updatedRegistro] as [null, Registro];
   }
-
   async remove(id: string): Promise<[Error, null] | [null, boolean]> {
     const deleted = await this.registrosRepository.delete(id);
 
@@ -80,7 +82,6 @@ export class RegistrosService {
 
     return [null, deleted] as [null, boolean];
   }
-
   private calculateSalaryPercentage(
     salary: number,
     percentage: number,

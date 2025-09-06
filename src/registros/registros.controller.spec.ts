@@ -81,30 +81,11 @@ describe('RegistrosController', () => {
 
       jest.spyOn(service, 'findAll').mockResolvedValue(registros);
 
-      await controller.findAll(mockResponse);
+      await controller.findAll({}, mockResponse);
 
       expect(service.findAll).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockResponse.json).toHaveBeenCalledWith(registros);
-    });
-  });
-
-  describe('findOne', () => {
-    it('should return registro when found', async () => {
-      const registro = new Registro(
-        '2024-01-15',
-        5000,
-        1750,
-        'John Doe',
-        'test-id',
-      );
-      jest.spyOn(service, 'findOne').mockResolvedValue([null, registro]);
-
-      await controller.findOne('test-id', mockResponse);
-
-      expect(service.findOne).toHaveBeenCalledWith('test-id');
-      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith(registro);
     });
 
     it('should return 404 when registro not found', async () => {

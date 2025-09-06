@@ -5,6 +5,7 @@ export class Registro {
   calculatedSalary: number;
   employee: string;
   createdAt: Date;
+  calculatedAdmissionDate?: string;
 
   constructor(
     admissionDate: string,
@@ -12,6 +13,7 @@ export class Registro {
     calculatedSalary: number,
     employee: string,
     id?: string,
+    calculatedAdmissionDate?: string,
   ) {
     this.id = id || crypto.randomUUID();
     this.admissionDate = admissionDate;
@@ -19,5 +21,6 @@ export class Registro {
     this.calculatedSalary = calculatedSalary;
     this.employee = employee;
     this.createdAt = new Date();
+    this.calculatedAdmissionDate = calculatedAdmissionDate;
   }
 }

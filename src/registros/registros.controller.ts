@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Res,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ZodBody } from '../common/decorators/zod-body.decorator';
@@ -17,6 +18,7 @@ import {
   UpdateRegistroSchema,
 } from './dto/create-registro.dto';
 import { RegistrosService } from './registros.service';
+import { RegistroFilters } from './dto/filter-registro.dto';
 
 @Controller('registros')
 export class RegistrosController {
@@ -32,8 +34,23 @@ export class RegistrosController {
   }
 
   @Get()
-  async findAll(@Res() res: Response) {
-    const registros = await this.registrosService.findAll();
+  async findAll(@Query() queryParams: any, @Res() res: Response) {
+    const filters: RegistroFilters = {};
+
+    if (queryParams.startDate) filters.startDate = queryParams.startDate;
+    if (queryParams.endDate) filters.endDate = queryParams.endDate;
+    if (queryParams.startSalary)
+      filters.startSalary = Number(queryParams.startSalary);
+    if (queryParams.endSalary)
+      filters.endSalary = Number(queryParams.endSalary);
+    if (queryParams.startSalaryCalculated)
+      filters.startSalaryCalculated = Number(queryParams.startSalaryCalculated);
+    if (queryParams.endSalaryCalculated)
+      filters.endSalaryCalculated = Number(queryParams.endSalaryCalculated);
+    if (queryParams.employee) filters.employee = queryParams.employee;
+    if (queryParams.id) filters.id = queryParams.id;
+
+    const registros = await this.registrosService.findAll(filters);
     return res.status(HttpStatus.OK).json(registros);
   }
 

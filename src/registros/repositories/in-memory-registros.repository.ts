@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IRegistrosRepository } from '../interfaces/registros-repository.interface';
 import { Registro } from '../entities/registro.entity';
+import { RegistroFilters } from '../dto/filter-registro.dto';
 
 @Injectable()
 export class InMemoryRegistrosRepository implements IRegistrosRepository {
@@ -11,8 +12,61 @@ export class InMemoryRegistrosRepository implements IRegistrosRepository {
     return registro;
   }
 
-  async get(): Promise<Registro[]> {
-    return [...this.registros];
+  async get(filters?: RegistroFilters): Promise<Registro[]> {
+    let filteredRegistros = [...this.registros];
+
+    if (!filters) {
+      return filteredRegistros;
+    }
+
+    if (filters.id) {
+      filteredRegistros = filteredRegistros.filter((r) => r.id === filters.id);
+    }
+
+    if (filters.startDate) {
+      filteredRegistros = filteredRegistros.filter(
+        (r) => r.admissionDate >= filters.startDate!,
+      );
+    }
+
+    if (filters.endDate) {
+      filteredRegistros = filteredRegistros.filter(
+        (r) => r.admissionDate <= filters.endDate!,
+      );
+    }
+
+    if (filters.startSalary !== undefined) {
+      filteredRegistros = filteredRegistros.filter(
+        (r) => r.salary >= filters.startSalary!,
+      );
+    }
+
+    if (filters.endSalary !== undefined) {
+      filteredRegistros = filteredRegistros.filter(
+        (r) => r.salary <= filters.endSalary!,
+      );
+    }
+
+    if (filters.startSalaryCalculated !== undefined) {
+      filteredRegistros = filteredRegistros.filter(
+        (r) => r.calculatedSalary >= filters.startSalaryCalculated!,
+      );
+    }
+
+    if (filters.endSalaryCalculated !== undefined) {
+      filteredRegistros = filteredRegistros.filter(
+        (r) => r.calculatedSalary <= filters.endSalaryCalculated!,
+      );
+    }
+
+    if (filters.employee) {
+      const searchTerm = filters.employee.toLowerCase();
+      filteredRegistros = filteredRegistros.filter((r) =>
+        r.employee.toLowerCase().includes(searchTerm),
+      );
+    }
+
+    return filteredRegistros;
   }
 
   async getById(id: string): Promise<Registro | null> {
