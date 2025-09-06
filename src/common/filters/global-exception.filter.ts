@@ -53,7 +53,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message = this.translateMessage(exception.message);
 
       if (exception.message === 'Registro not found') {
-        status = HttpStatus.BAD_REQUEST;
+        status = HttpStatus.NOT_FOUND;
       } else {
         status = HttpStatus.BAD_REQUEST;
       }

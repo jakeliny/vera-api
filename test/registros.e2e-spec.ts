@@ -57,14 +57,8 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Validation failed');
-          expect(res.body.errors).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({
-                field: 'admissionDate',
-                message: 'Admission date cannot be in the future',
-              }),
-            ]),
+          expect(res.body.message).toBe(
+            'Data de admissão não pode ser no futuro',
           );
         });
     });
@@ -81,15 +75,7 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Validation failed');
-          expect(res.body.errors).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({
-                field: 'salary',
-                message: 'Salary must be at least 1300',
-              }),
-            ]),
-          );
+          expect(res.body.message).toBe('Salário deve ser no mínimo 1300');
         });
     });
 
@@ -105,15 +91,7 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Validation failed');
-          expect(res.body.errors).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({
-                field: 'salary',
-                message: 'Salary cannot exceed 100,000',
-              }),
-            ]),
-          );
+          expect(res.body.message).toBe('Salário não pode exceder 100.000');
         });
     });
 
@@ -130,14 +108,8 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Validation failed');
-          expect(res.body.errors).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({
-                field: 'employee',
-                message: 'Employee name cannot exceed 30 characters',
-              }),
-            ]),
+          expect(res.body.message).toBe(
+            'Nome do funcionário não pode exceder 30 caracteres',
           );
         });
     });
@@ -154,14 +126,8 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Validation failed');
-          expect(res.body.errors).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({
-                field: 'admissionDate',
-                message: 'Date must be in YYYY-MM-DD format',
-              }),
-            ]),
+          expect(res.body.message).toBe(
+            'Data deve estar no formato AAAA-MM-DD',
           );
         });
     });
@@ -208,7 +174,7 @@ describe('RegistrosController (e2e)', () => {
         .get('/registros/non-existent-id')
         .expect(404)
         .expect((res) => {
-          expect(res.body.message).toBe('Registro not found');
+          expect(res.body.message).toBe('Registro não encontrado');
         });
     });
 
@@ -235,7 +201,7 @@ describe('RegistrosController (e2e)', () => {
     });
   });
 
-  describe('/registros/:id (PUT)', () => {
+  describe('/registros/:id (PATCH)', () => {
     it('should update a registro', async () => {
       const createRegistroDto = {
         admissionDate: '2024-01-15',
@@ -251,7 +217,7 @@ describe('RegistrosController (e2e)', () => {
       const updateData = { salary: 7000 };
 
       return request(app.getHttpServer())
-        .put(`/registros/${registroId}`)
+        .patch(`/registros/${registroId}`)
         .send(updateData)
         .expect(200)
         .expect((res) => {
@@ -264,7 +230,7 @@ describe('RegistrosController (e2e)', () => {
       const updateData = { salary: 7000 };
 
       return request(app.getHttpServer())
-        .put('/registros/non-existent-id')
+        .patch('/registros/non-existent-id')
         .send(updateData)
         .expect(404);
     });
