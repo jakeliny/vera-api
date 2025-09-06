@@ -107,7 +107,6 @@ export const CreateRegistroSwagger = () =>
     ApiResponse({
       status: 201,
       description: 'Registry created successfully',
-      schema: { example: REGISTRO_EXAMPLES.registroResponse },
     }),
     commonResponses.badRequest,
   );
@@ -116,7 +115,8 @@ export const GetAllRegistrosSwagger = () =>
   applyDecorators(
     ApiOperation({
       summary: 'Get all registros',
-      description: 'Retrieves all employee registries with optional filtering',
+      description:
+        'Retrieves all employee registries with optional filtering and pagination',
     }),
     ApiQuery({
       name: 'startDate',
@@ -154,10 +154,44 @@ export const GetAllRegistrosSwagger = () =>
       description: 'Filter by specific ID',
       example: '550e8400-e29b-41d4-a716-446655440000',
     }),
+    ApiQuery({
+      name: 'page',
+      required: false,
+      description: 'Page number (default: 0)',
+      example: 0,
+    }),
+    ApiQuery({
+      name: 'limit',
+      required: false,
+      description: 'Number of items per page (default: 8)',
+      example: 8,
+    }),
+    ApiQuery({
+      name: 'order',
+      required: false,
+      description: 'Field to order by (default: admissionDate)',
+      enum: ['employee', 'admissionDate', 'salary', 'calculatedSalary'],
+      example: 'admissionDate',
+    }),
+    ApiQuery({
+      name: 'orderBy',
+      required: false,
+      description: 'Sorting direction (default: desc)',
+      enum: ['asc', 'desc'],
+      example: 'desc',
+    }),
     ApiResponse({
       status: 200,
-      description: 'List of registries',
-      schema: { example: [REGISTRO_EXAMPLES.registroResponse] },
+      description: 'Paginated list of registries',
+      schema: {
+        example: {
+          total: 25,
+          page: 0,
+          totalPages: 4,
+          limit: 8,
+          data: [REGISTRO_EXAMPLES.registroResponse],
+        },
+      },
     }),
   );
 
@@ -202,9 +236,8 @@ export const UpdateRegistroSwagger = () =>
       },
     }),
     ApiResponse({
-      status: 200,
+      status: 201,
       description: 'Registry updated successfully',
-      schema: { example: REGISTRO_EXAMPLES.updatedResponse },
     }),
     commonResponses.notFound,
     commonResponses.badRequest,
@@ -218,7 +251,7 @@ export const DeleteRegistroSwagger = () =>
     }),
     idParam,
     ApiResponse({
-      status: 204,
+      status: 201,
       description: 'Registry deleted successfully',
     }),
     commonResponses.notFound,

@@ -19,7 +19,7 @@ import {
   UpdateRegistroSchema,
 } from './dto/create-registro.dto';
 import { RegistrosService } from './registros.service';
-import { RegistroFilters } from './dto/filter-registro.dto';
+import { RegistroFilters, PaginationParams } from './dto/filter-registro.dto';
 import {
   CreateRegistroSwagger,
   GetAllRegistrosSwagger,
@@ -39,8 +39,8 @@ export class RegistrosController {
     @ZodBody(CreateRegistroSchema) createRegistroDto: CreateRegistroDto,
     @Res() res: Response,
   ) {
-    const registro = await this.registrosService.create(createRegistroDto);
-    return res.status(HttpStatus.CREATED).json(registro);
+    await this.registrosService.create(createRegistroDto);
+    return res.status(HttpStatus.CREATED).send();
   }
 
   @Get()
@@ -61,8 +61,30 @@ export class RegistrosController {
     if (queryParams.employee) filters.employee = queryParams.employee;
     if (queryParams.id) filters.id = queryParams.id;
 
-    const registros = await this.registrosService.findAll(filters);
-    return res.status(HttpStatus.OK).json(registros);
+    const pagination: PaginationParams = {
+      page: queryParams.page ? Number(queryParams.page) : 0,
+      limit: queryParams.limit ? Number(queryParams.limit) : 8,
+      order: queryParams.order || 'admissionDate',
+      orderBy: queryParams.orderBy || 'desc',
+    };
+
+    if (
+      !['employee', 'admissionDate', 'salary', 'calculatedSalary'].includes(
+        pagination.order,
+      )
+    ) {
+      pagination.order = 'admissionDate';
+    }
+
+    if (!['asc', 'desc'].includes(pagination.orderBy)) {
+      pagination.orderBy = 'desc';
+    }
+
+    const result = await this.registrosService.findAllPaginated(
+      filters,
+      pagination,
+    );
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @Get(':id')
@@ -84,16 +106,13 @@ export class RegistrosController {
     @ZodBody(UpdateRegistroSchema) updateRegistroDto: UpdateRegistroDto,
     @Res() res: Response,
   ) {
-    const [error, registro] = await this.registrosService.patch(
-      id,
-      updateRegistroDto,
-    );
+    const [error] = await this.registrosService.patch(id, updateRegistroDto);
 
     if (error) {
       throw error;
     }
 
-    return res.status(HttpStatus.OK).json(registro);
+    return res.status(HttpStatus.CREATED).send();
   }
 
   @Delete(':id')
@@ -105,6 +124,6 @@ export class RegistrosController {
       throw error;
     }
 
-    return res.status(HttpStatus.NO_CONTENT).send();
+    return res.status(HttpStatus.CREATED).send();
   }
 }

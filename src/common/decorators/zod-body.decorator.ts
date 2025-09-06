@@ -1,8 +1,4 @@
-import {
-  createParamDecorator,
-  ExecutionContext,
-  BadRequestException,
-} from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { ZodSchema } from 'zod';
 
 export const ZodBody = (schema: ZodSchema) =>

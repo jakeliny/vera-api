@@ -6,7 +6,11 @@ import {
 import { Registro } from './entities/registro.entity';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
 import { DateUtils } from '../common/utils/date.utils';
-import { RegistroFilters } from './dto/filter-registro.dto';
+import {
+  RegistroFilters,
+  PaginationParams,
+  PaginatedResponse,
+} from './dto/filter-registro.dto';
 import { SalaryUtils } from '../common/utils/salary.utils';
 import { ErrorMessages } from '../common/enums/error-messages.enum';
 
@@ -46,6 +50,25 @@ export class RegistrosService {
         registro.admissionDate,
       ),
     }));
+  }
+
+  async findAllPaginated(
+    filters?: RegistroFilters,
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Registro>> {
+    const result = await this.registrosRepository.getPaginated(
+      filters,
+      pagination,
+    );
+    return {
+      ...result,
+      data: result.data.map((registro) => ({
+        ...registro,
+        calculatedAdmissionDate: DateUtils.calculateElapsedTime(
+          registro.admissionDate,
+        ),
+      })),
+    };
   }
 
   async findOne(id: string): Promise<[Error, null] | [null, Registro]> {

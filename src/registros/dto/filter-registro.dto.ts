@@ -35,3 +35,18 @@ export interface RegistroFilters {
   employee?: string;
   id?: string;
 }
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+  order: 'employee' | 'admissionDate' | 'salary' | 'calculatedSalary';
+  orderBy: 'asc' | 'desc';
+}
+
+export interface PaginatedResponse<T> {
+  total: number;
+  page: number;
+  totalPages: number;
+  limit: number;
+  data: T[];
+}
