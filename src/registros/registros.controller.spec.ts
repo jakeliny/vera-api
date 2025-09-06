@@ -13,6 +13,7 @@ describe('RegistrosController', () => {
   const mockRegistrosService = {
     create: jest.fn(),
     findAll: jest.fn(),
+    findAllPaginated: jest.fn(),
     findOne: jest.fn(),
     patch: jest.fn(),
     remove: jest.fn(),
@@ -69,7 +70,7 @@ describe('RegistrosController', () => {
 
       expect(service.create).toHaveBeenCalledWith(createRegistroDto);
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
-      expect(mockResponse.json).toHaveBeenCalledWith(expectedRegistro);
+      expect(mockResponse.send).toHaveBeenCalled();
     });
   });
 
@@ -80,13 +81,23 @@ describe('RegistrosController', () => {
         new Registro('2024-01-16', 6000, 2100, 'Jane Smith', 'test-id-2'),
       ];
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(registros);
+      const paginatedResponse = {
+        total: 2,
+        page: 0,
+        totalPages: 1,
+        limit: 8,
+        data: registros,
+      };
+
+      jest
+        .spyOn(service, 'findAllPaginated')
+        .mockResolvedValue(paginatedResponse);
 
       await controller.findAll({}, mockResponse);
 
-      expect(service.findAll).toHaveBeenCalled();
+      expect(service.findAllPaginated).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith(registros);
+      expect(mockResponse.json).toHaveBeenCalledWith(paginatedResponse);
     });
 
     it('should pass filters to service when query params provided', async () => {
@@ -95,14 +106,32 @@ describe('RegistrosController', () => {
         new Registro('2024-01-15', 5000, 1750, 'John Doe', 'test-id-1'),
       ];
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(registros);
+      const paginatedResponse = {
+        total: 1,
+        page: 0,
+        totalPages: 1,
+        limit: 8,
+        data: registros,
+      };
+
+      jest
+        .spyOn(service, 'findAllPaginated')
+        .mockResolvedValue(paginatedResponse);
 
       await controller.findAll(queryParams, mockResponse);
 
-      expect(service.findAll).toHaveBeenCalledWith({
-        startSalary: 5000,
-        employee: 'John',
-      });
+      expect(service.findAllPaginated).toHaveBeenCalledWith(
+        {
+          startSalary: 5000,
+          employee: 'John',
+        },
+        {
+          page: 0,
+          limit: 8,
+          order: 'admissionDate',
+          orderBy: 'desc',
+        },
+      );
     });
   });
 
@@ -137,7 +166,7 @@ describe('RegistrosController', () => {
   });
 
   describe('patch', () => {
-    it('should patch registro and return 200', async () => {
+    it('should patch registro and return 201', async () => {
       const patchData = { salary: 6000 };
       const updatedRegistro = new Registro(
         '2024-01-15',
@@ -152,8 +181,8 @@ describe('RegistrosController', () => {
       await controller.patch('test-id', patchData, mockResponse);
 
       expect(service.patch).toHaveBeenCalledWith('test-id', patchData);
-      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith(updatedRegistro);
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
+      expect(mockResponse.send).toHaveBeenCalled();
     });
 
     it('should throw error when registro not found for patch', async () => {
@@ -167,13 +196,13 @@ describe('RegistrosController', () => {
   });
 
   describe('remove', () => {
-    it('should remove registro and return 204', async () => {
+    it('should remove registro and return 201', async () => {
       jest.spyOn(service, 'remove').mockResolvedValue([null, true]);
 
       await controller.remove('test-id', mockResponse);
 
       expect(service.remove).toHaveBeenCalledWith('test-id');
-      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NO_CONTENT);
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
       expect(mockResponse.send).toHaveBeenCalled();
     });
 

@@ -16,6 +16,7 @@ describe('RegistrosService', () => {
   const mockRepository: IRegistrosRepository = {
     insert: jest.fn(),
     get: jest.fn(),
+    getPaginated: jest.fn(),
     getById: jest.fn(),
     put: jest.fn(),
     delete: jest.fn(),
