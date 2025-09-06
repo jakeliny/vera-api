@@ -5,7 +5,9 @@ import {
 } from './dto/create-registro.dto';
 import { Registro } from './entities/registro.entity';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
+import { DateUtils } from '../common/utils/date.utils';
 import { RegistroFilters } from './dto/filter-registro.dto';
+import { SalaryUtils } from '../common/utils/salary.utils';
 
 @Injectable()
 export class RegistrosService {
@@ -15,9 +17,12 @@ export class RegistrosService {
   ) {}
 
   async create(createRegistroDto: CreateRegistroDto): Promise<Registro> {
-    const calculatedSalary = this.calculateSalaryPercentage(
+    const calculatedSalary = SalaryUtils.calculateSalaryPercentage(
       createRegistroDto.salary,
       35,
+    );
+    const calculatedAdmissionDate = DateUtils.calculateElapsedTime(
+      createRegistroDto.admissionDate,
     );
 
     const registro = new Registro(
@@ -25,6 +30,8 @@ export class RegistrosService {
       createRegistroDto.salary,
       calculatedSalary,
       createRegistroDto.employee,
+      undefined,
+      calculatedAdmissionDate,
     );
 
     return this.registrosRepository.insert(registro);
@@ -34,6 +41,9 @@ export class RegistrosService {
     const registros = await this.registrosRepository.get(filters);
     return registros.map((registro) => ({
       ...registro,
+      calculatedAdmissionDate: DateUtils.calculateElapsedTime(
+        registro.admissionDate,
+      ),
     }));
   }
 
@@ -44,8 +54,16 @@ export class RegistrosService {
       return [new Error('Registro not found'), null];
     }
 
-    return [null, registro] as [null, Registro];
+    const registroWithCalculatedDate = {
+      ...registro,
+      calculatedAdmissionDate: DateUtils.calculateElapsedTime(
+        registro.admissionDate,
+      ),
+    };
+
+    return [null, registroWithCalculatedDate] as [null, Registro];
   }
+
   async update(
     id: string,
     updateData: UpdateRegistroDto,
@@ -81,11 +99,5 @@ export class RegistrosService {
     }
 
     return [null, deleted] as [null, boolean];
-  }
-  private calculateSalaryPercentage(
-    salary: number,
-    percentage: number,
-  ): number {
-    return Number(((salary * percentage) / 100).toFixed(2));
   }
 }

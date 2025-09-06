@@ -59,7 +59,7 @@ export class RegistrosController {
     const [error, registro] = await this.registrosService.findOne(id);
 
     if (error) {
-      return res.status(HttpStatus.NOT_FOUND).json({ message: error.message });
+      throw error;
     }
 
     return res.status(HttpStatus.OK).json(registro);
@@ -71,13 +71,13 @@ export class RegistrosController {
     @ZodBody(UpdateRegistroSchema) updateRegistroDto: UpdateRegistroDto,
     @Res() res: Response,
   ) {
-    const [error, registro] = await this.registrosService.update(
+    const [error, registro] = await this.registrosService.Put(
       id,
       updateRegistroDto,
     );
 
     if (error) {
-      return res.status(HttpStatus.NOT_FOUND).json({ message: error.message });
+      throw error;
     }
 
     return res.status(HttpStatus.OK).json(registro);
@@ -88,7 +88,7 @@ export class RegistrosController {
     const [error] = await this.registrosService.remove(id);
 
     if (error) {
-      return res.status(HttpStatus.NOT_FOUND).json({ message: error.message });
+      throw error;
     }
 
     return res.status(HttpStatus.NO_CONTENT).send();

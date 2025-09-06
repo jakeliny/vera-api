@@ -88,17 +88,50 @@ describe('RegistrosController', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(registros);
     });
 
-    it('should return 404 when registro not found', async () => {
+    it('should pass filters to service when query params provided', async () => {
+      const queryParams = { startSalary: '5000', employee: 'John' };
+      const registros = [
+        new Registro('2024-01-15', 5000, 1750, 'John Doe', 'test-id-1'),
+      ];
+
+      jest.spyOn(service, 'findAll').mockResolvedValue(registros);
+
+      await controller.findAll(queryParams, mockResponse);
+
+      expect(service.findAll).toHaveBeenCalledWith({
+        startSalary: 5000,
+        employee: 'John',
+      });
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return registro when found', async () => {
+      const registro = new Registro(
+        '2024-01-15',
+        5000,
+        1750,
+        'John Doe',
+        'test-id',
+      );
+      jest.spyOn(service, 'findOne').mockResolvedValue([null, registro]);
+
+      await controller.findOne('test-id', mockResponse);
+
+      expect(service.findOne).toHaveBeenCalledWith('test-id');
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(mockResponse.json).toHaveBeenCalledWith(registro);
+    });
+
+    it('should throw error when registro not found', async () => {
       const error = new Error('Registro not found');
       jest.spyOn(service, 'findOne').mockResolvedValue([error, null]);
 
-      await controller.findOne('non-existent-id', mockResponse);
+      await expect(
+        controller.findOne('non-existent-id', mockResponse),
+      ).rejects.toThrow('Registro not found');
 
       expect(service.findOne).toHaveBeenCalledWith('non-existent-id');
-      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Registro not found',
-      });
     });
   });
 
@@ -132,10 +165,9 @@ describe('RegistrosController', () => {
         mockResponse,
       );
 
-      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Registro not found',
-      });
+      await expect(
+        controller.remove('non-existent-id', mockResponse),
+      ).rejects.toThrow('Registro not found');
     });
   });
 
@@ -150,16 +182,13 @@ describe('RegistrosController', () => {
       expect(mockResponse.send).toHaveBeenCalled();
     });
 
-    it('should return 404 when registro not found for deletion', async () => {
+    it('should throw error when registro not found for deletion', async () => {
       const error = new Error('Registro not found');
       jest.spyOn(service, 'remove').mockResolvedValue([error, null]);
 
-      await controller.remove('non-existent-id', mockResponse);
-
-      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Registro not found',
-      });
+      await expect(
+        controller.remove('non-existent-id', mockResponse),
+      ).rejects.toThrow('Registro not found');
     });
   });
 });

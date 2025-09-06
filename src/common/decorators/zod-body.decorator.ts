@@ -13,15 +13,7 @@ export const ZodBody = (schema: ZodSchema) =>
     const result = schema.safeParse(body);
 
     if (!result.success) {
-      const errors = result.error.issues.map((issue) => ({
-        field: issue.path.join('.'),
-        message: issue.message,
-      }));
-
-      throw new BadRequestException({
-        message: 'Validation failed',
-        errors,
-      });
+      throw result.error;
     }
 
     return result.data;

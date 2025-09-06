@@ -1,14 +1,13 @@
 import { z } from 'zod';
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
 export const CreateRegistroSchema = z.object({
   admissionDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .refine((date) => {
       const inputDate = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       return inputDate <= today;
     }, 'Admission date cannot be in the future'),
   salary: z
@@ -28,6 +27,8 @@ export const UpdateRegistroSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .refine((date) => {
       const inputDate = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       return inputDate <= today;
     }, 'Admission date cannot be in the future')
     .optional(),
