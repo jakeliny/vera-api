@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { randomUUID } from 'crypto';
 
 export class Registro {
   @ApiProperty({
@@ -58,7 +59,7 @@ export class Registro {
     id?: string,
     calculatedAdmissionDate?: string,
   ) {
-    this.id = id || crypto.randomUUID();
+    this.id = id || randomUUID();
     this.admissionDate = admissionDate;
     this.salary = salary;
     this.calculatedSalary = calculatedSalary;
