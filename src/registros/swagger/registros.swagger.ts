@@ -25,7 +25,7 @@ export const REGISTRO_EXAMPLES = {
     calculatedSalary: 1750.0,
     employee: 'João Silva',
     createdAt: '2024-01-15T10:30:00.000Z',
-    calculatedAdmissionDate: '1 year, 2 months e 10 days',
+    calculatedAdmissionDate: '10 dias, 2 meses e 1 ano',
   },
 
   updateRequest: {
@@ -49,7 +49,7 @@ export const REGISTRO_EXAMPLES = {
     calculatedSalary: 2450.0,
     employee: 'Pedro Costa',
     createdAt: '2024-01-15T10:30:00.000Z',
-    calculatedAdmissionDate: '8 months e 15 days',
+    calculatedAdmissionDate: '15 dias e 8 meses',
   },
 };
 

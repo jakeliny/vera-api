@@ -19,7 +19,7 @@ export class Registro {
   @ApiProperty({
     description: 'Employee base salary',
     example: 5000,
-    minimum: 1300,
+    minimum: 1,
     maximum: 100000,
   })
   salary: number;
@@ -46,7 +46,7 @@ export class Registro {
 
   @ApiProperty({
     description: 'Calculated time elapsed since admission',
-    example: '1 year, 2 months e 10 days',
+    example: '10 dias, 2 meses e 1 ano',
     required: false,
   })
   calculatedAdmissionDate?: string;

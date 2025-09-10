@@ -19,12 +19,11 @@ export class DateUtils {
     }
 
     const parts = [];
-    if (days > 0) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
-    if (months > 0)
-      parts.push(`${months} ${months === 1 ? 'month' : 'months'}`);
-    if (years > 0) parts.push(`${years} ${years === 1 ? 'year' : 'years'}`);
+    if (days > 0) parts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
+    if (months > 0) parts.push(`${months} ${months === 1 ? 'mês' : 'meses'}`);
+    if (years > 0) parts.push(`${years} ${years === 1 ? 'ano' : 'anos'}`);
 
-    if (parts.length === 0) return '0 days';
+    if (parts.length === 0) return '0 dias';
     if (parts.length === 1) return parts[0];
     if (parts.length === 2) return `${parts[0]} e ${parts[1]}`;
 

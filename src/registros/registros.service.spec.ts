@@ -81,7 +81,7 @@ describe('RegistrosService', () => {
           salary: 5000,
           calculatedSalary: 1750,
           employee: 'John Doe',
-          calculatedAdmissionDate: '5 days',
+          calculatedAdmissionDate: '5 dias',
         }),
       );
       expect(result).toEqual(expectedRegistro);
@@ -134,7 +134,7 @@ describe('RegistrosService', () => {
       expect(result[0]).toEqual(
         expect.objectContaining({
           ...registros[0],
-          calculatedAdmissionDate: '5 days',
+          calculatedAdmissionDate: '5 dias',
         }),
       );
     });
@@ -175,7 +175,7 @@ describe('RegistrosService', () => {
       expect(result).toEqual(
         expect.objectContaining({
           ...registro,
-          calculatedAdmissionDate: '5 days',
+          calculatedAdmissionDate: '5 dias',
         }),
       );
     });
@@ -225,7 +225,7 @@ describe('RegistrosService', () => {
       expect(result).toEqual(
         expect.objectContaining({
           ...updatedRegistro,
-          calculatedAdmissionDate: '5 days',
+          calculatedAdmissionDate: '5 dias',
         }),
       );
       expect(repository.put).toHaveBeenCalledWith('test-id', {

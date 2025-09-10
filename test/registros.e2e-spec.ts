@@ -78,7 +78,7 @@ describe('RegistrosController (e2e)', () => {
     it('should return 400 for salary below minimum', () => {
       const createRegistroDto = {
         admissionDate: '2024-01-15',
-        salary: 1200,
+        salary: -1,
         employee: 'John Doe',
       };
 
@@ -87,7 +87,7 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Salário deve ser no mínimo 1300');
+          expect(res.body.message).toBe('Salário deve ser um número positivo');
         });
     });
 

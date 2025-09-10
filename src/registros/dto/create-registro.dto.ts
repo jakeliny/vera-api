@@ -64,7 +64,7 @@ export class CreateRegistroSwaggerDto {
   admissionDate: string;
 
   @ApiProperty({
-    description: 'Employee base salary (minimum 1300, maximum 100,000)',
+    description: 'Employee base salary (minimum 1, maximum 100,000)',
     example: 5000,
     minimum: salary.minimum,
     maximum: salary.maximum,
@@ -89,7 +89,7 @@ export class UpdateRegistroSwaggerDto {
   admissionDate?: string;
 
   @ApiPropertyOptional({
-    description: 'Employee base salary (minimum 1300, maximum 100,000)',
+    description: 'Employee base salary (minimum 1, maximum 100,000)',
     example: 6000,
     minimum: salary.minimum,
     maximum: salary.maximum,
