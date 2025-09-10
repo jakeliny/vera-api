@@ -169,16 +169,16 @@ export const GetAllRegistrosSwagger = () =>
     ApiQuery({
       name: 'order',
       required: false,
-      description: 'Field to order by (default: admissionDate)',
-      enum: ['employee', 'admissionDate', 'salary', 'calculatedSalary'],
-      example: 'admissionDate',
+      description: 'Sorting direction (default: desc)',
+      enum: ['asc', 'desc'],
+      example: 'desc',
     }),
     ApiQuery({
       name: 'orderBy',
       required: false,
-      description: 'Sorting direction (default: desc)',
-      enum: ['asc', 'desc'],
-      example: 'desc',
+      description: 'Field to order by (default: admissionDate)',
+      enum: ['employee', 'admissionDate', 'salary', 'calculatedSalary'],
+      example: 'admissionDate',
     }),
     ApiResponse({
       status: 200,

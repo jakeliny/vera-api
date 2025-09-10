@@ -128,8 +128,8 @@ describe('RegistrosController', () => {
         {
           page: 0,
           limit: 8,
-          order: 'admissionDate',
-          orderBy: 'desc',
+          order: 'desc',
+          orderBy: 'admissionDate',
         },
       );
     });

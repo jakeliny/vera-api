@@ -130,11 +130,11 @@ export class MongoRegistrosRepository implements IRegistrosRepository {
 
       const page = Math.max(0, pagination?.page || 0);
       const limit = Math.min(100, Math.max(1, pagination?.limit || 8));
-      const order = pagination?.order || 'admissionDate';
-      const orderBy = pagination?.orderBy || 'asc';
+      const order = pagination?.order || 'desc';
+      const orderBy = pagination?.orderBy || 'admissionDate';
 
       const sortOptions: Record<string, 1 | -1> = {
-        [order]: orderBy === 'asc' ? 1 : -1,
+        [orderBy]: order === 'asc' ? 1 : -1,
       };
 
       const [total, docs] = await Promise.all([

@@ -64,20 +64,20 @@ export class RegistrosController {
     const pagination: PaginationParams = {
       page: queryParams.page ? Number(queryParams.page) : 0,
       limit: queryParams.limit ? Number(queryParams.limit) : 8,
-      order: queryParams.order || 'admissionDate',
-      orderBy: queryParams.orderBy || 'desc',
+      order: queryParams.order || 'desc',
+      orderBy: queryParams.orderBy || 'admissionDate',
     };
+
+    if (!['asc', 'desc'].includes(pagination.order)) {
+      pagination.order = 'desc';
+    }
 
     if (
       !['employee', 'admissionDate', 'salary', 'calculatedSalary'].includes(
-        pagination.order,
+        pagination.orderBy,
       )
     ) {
-      pagination.order = 'admissionDate';
-    }
-
-    if (!['asc', 'desc'].includes(pagination.orderBy)) {
-      pagination.orderBy = 'desc';
+      pagination.orderBy = 'admissionDate';
     }
 
     const result = await this.registrosService.findAllPaginated(

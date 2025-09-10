@@ -39,8 +39,8 @@ export interface RegistroFilters {
 export interface PaginationParams {
   page: number;
   limit: number;
-  order: 'employee' | 'admissionDate' | 'salary' | 'calculatedSalary';
-  orderBy: 'asc' | 'desc';
+  order: 'asc' | 'desc';
+  orderBy: 'employee' | 'admissionDate' | 'salary' | 'calculatedSalary';
 }
 
 export interface PaginatedResponse<T> {

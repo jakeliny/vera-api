@@ -88,7 +88,7 @@ export class InMemoryRegistrosRepository implements IRegistrosRepository {
         let aValue: any;
         let bValue: any;
 
-        switch (order) {
+        switch (orderBy) {
           case 'employee':
             aValue = a.employee.toLowerCase();
             bValue = b.employee.toLowerCase();
@@ -111,10 +111,10 @@ export class InMemoryRegistrosRepository implements IRegistrosRepository {
         }
 
         if (aValue < bValue) {
-          return orderBy === 'asc' ? -1 : 1;
+          return order === 'asc' ? -1 : 1;
         }
         if (aValue > bValue) {
-          return orderBy === 'asc' ? 1 : -1;
+          return order === 'asc' ? 1 : -1;
         }
         return 0;
       });
