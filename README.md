@@ -6,49 +6,126 @@ V.E.R.A é um acrônimo para **Valor Efetivo de Renda Analisada**, um serviço q
 
 Esta aplicação é uma API REST desenvolvida em **NestJS** que gerencia registros de funcionários, calculando automaticamente valores de salário e tempo de trabalho. O grande diferencial do projeto é a flexibilidade, permitindo alternar facilmente entre persistência em memória para desenvolvimento rápido e **MongoDB** para produção, utilizando uma arquitetura modular e aderente aos princípios **SOLID**.
 
-## Stack Tecnológica
+## Stack de Tecnologias
 
 - **Backend**: Node.js, TypeScript, NestJS
 - **Banco de Dados**: MongoDB (com Mongoose ODM)
 - **Containerização**: Docker & Docker Compose
 - **Persistência**: Padrão de Repositório com estratégia dupla (In-Memory / MongoDB)
-- **Validação**: Esquemas Zod com decoradores customizados
+- **Validação**: Esquemas Zod com decorators customizados
 - **Documentação da API**: Swagger/OpenAPI
 
-## Arquitetura
+## Arquitetura do Projeto
 
-A aplicação foi estruturada com base na arquitetura **Repository Pattern**, permitindo a abstração da camada de persistência. A injeção de dependência do NestJS facilita a alternância de repositórios, conforme ilustrado abaixo:
+### Estrutura de Arquivos
 
 ```
-RegistrosService
-↓
-IRegistrosRepository (Interface)
-↓
-├─ InMemoryRegistrosRepository (Desenvolvimento)
-└─ MongoRegistrosRepository (Produção)
+src/
+├── common/           # Utilitários e infraestrutura compartilhados
+│ ├── decorators/     # Decorators personalizados (ZodBody)
+│ ├── enums/          # Enums para toda a aplicação
+│ ├── filters/        # Tratamento global de exceções
+│ └── utils/          # Funções utilitárias (data, salário)
+├── registros/        # Módulo de domínio principal
+│ ├── dto/            # Data Transfer Objects
+│ ├── entities/       # Entidades de domínio
+│ ├── interfaces/     # Contratos de Repository
+│ ├── repositories/   # Implementações de acesso a dados
+│ ├── schemas/        # Schemas do MongoDB
+│ └── swagger/        # Documentação da API
+├── app.module.ts     # Módulo raiz
+└── main.ts           # Ponto de entrada da aplicação
 ```
 
-### Injeção Baseada em Ambiente
+## Componentes Principais
 
-```typescript
-// Seleção automática de repositório baseada em USE_DATABASE
-{
-  provide: 'IRegistrosRepository',
-  useFactory: (configService, inMemoryRepo, mongoRepo) => {
-    const useDatabase = configService.get('USE_DATABASE') === 'true';
-    return useDatabase ? mongoRepo : inMemoryRepo;
-  },
-  inject: [ConfigService, InMemoryRegistrosRepository, MongoRegistrosRepository],
-}
-```
+### Entities
+
+- **Registro**: Entidade de domínio que representa os registros de funcionários
+  - Contém lógica de negócio no construtor
+  - Gera UUID automaticamente
+  - Encapsula campos calculados
+
+### DTOs e Validações
+
+- **Input Validation**: Schemas Zod para validação em tempo de execução
+- **DTO Classes**: Classes DTOs separadas para operações de Create/Update
+- **Swagger DTOs**: Classes dedicadas para a documentação da API
+- **Custom Decorator**: `@ZodBody` para validação de requisição
+
+### Repository Pattern
+
+- **Interface**: `IRegistrosRepository` define o contrato
+- **Implementações**:
+  - `MongoRegistrosRepository`: Persistência em produção com MongoDB
+  - `InMemoryRegistrosRepository`: Para testes e desenvolvimento
+- **Dynamic Selection**: O Repository é escolhido com base na configuração do ambiente
+
+### Service Layer
+
+- **RegistrosService**: Orquestração da lógica de negócio
+  - Cálculos de salário (regra dos 35%)
+  - Cálculos de tempo decorrido da data
+  - Tratamento de erro com retornos de tupla `[Error, Result]`
+  - Abstração do Repository através de dependency injection
+
+### Controller Layer
+
+- **RegistrosController**: Tratamento de requisições HTTP
+  - Endpoints RESTful (operações CRUD)
+  - Análise de query parameters para filtragem
+  - Suporte a pagination
+  - Formatação de resposta
+
+## Padrões de Key Design
+
+### Dependency Injection
+
+- Injeção baseada em interface para os repositories
+- Padrão de Factory para seleção dinâmica do repository
+- Troca de provider baseada em configuração
+
+### Error Handling
+
+- Filtro de exceção global com processamento de erro centralizado
+- Tradução de erros de validação Zod
+- Formato de resposta de erro consistente
+- Mensagens de erro internacionalizadas
+
+### Fluxo de Dados
+
+1. Requisição → Controller (validação via ZodBody)
+2. Controller → Service (lógica de negócio)
+3. Service → Repository (persistência de dados)
+4. Repository → Database/Memory
+5. Transformação da resposta e retorno
+
+## Gerenciamento de Configuração
+
+- Configuração baseada em ambiente via ConfigModule
+- Conexão de banco de dados dinâmica (MongoDB ou in-memory)
+- Configuração de CORS baseada no ambiente
+- Configuração de porta com fallback
+
+## Recursos da API
+
+- **Pagination**: Tamanho da página e ordenação configuráveis
+- **Filtering**: Suporte a filtragem de múltiplos campos
+- **Sorting**: Ordenação de campo dinâmica (asc/desc)
+- **Validation**: Validação de requisição com mensagens de erro detalhadas
+- **Documentation**: Swagger UI gerado automaticamente
+
+## Funções Utilitárias
+
+- **DateUtils**: Cálculos de tempo decorrido
+- **SalaryUtils**: Cálculos de salário baseados em porcentagem
+- **Error Translations**: Mensagens de erro internacionalizadas
 
 ## Pré-requisitos
 
 - Node.js >= 18
 - pnpm >= 8
 - Docker & Docker Compose (para configuração com MongoDB)
-
----
 
 ## Instalação e Configuração
 
@@ -86,7 +163,7 @@ Ideal para desenvolvimento rápido e testes sem dependências externas.
 
 ```bash
 
-# Garantir que USE_DATABASE=false no arquivo .env
+# Garantir USE_DATABASE=false no .env
 echo "USE_DATABASE=false" >> .env
 
 # Executar em modo desenvolvimento
@@ -96,9 +173,7 @@ pnpm start:dev
 **Características:**
 
 - Sem dependências externas.
-
 - Inicialização rápida.
-
 - Os dados não são persistidos, sendo reiniciados a cada `restart`.
 
 ### Opção 2: Configuração de Produção (MongoDB com Docker)
@@ -123,8 +198,6 @@ pnpm dev:stop
 - Configuração pronta para ser replicada em produção.
 - Conexão automática com o banco de dados.
 
----
-
 ## Scripts Principais
 
 | Script            | Descrição                                        |
@@ -135,8 +208,6 @@ pnpm dev:stop
 | `pnpm test`       | Executa testes unitários                         |
 | `pnpm test:cov`   | Executa testes com relatório de cobertura        |
 | `pnpm test:e2e`   | Executa testes end-to-end                        |
-
----
 
 ## Documentação e Endpoints da API
 
@@ -154,7 +225,7 @@ Uma vez em execução, a documentação interativa da API está disponível no *
 | PUT    | `/registros/:id` | Atualizar um registro     |
 | DELETE | `/registros/:id` | Deletar um registro       |
 
-##Testes
+## Testes
 
 ### Execução de Testes
 
