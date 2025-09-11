@@ -49,8 +49,8 @@ describe('RegistrosController', () => {
   });
 
   describe('create', () => {
-    it('should create a registro and return 201', async () => {
-      const createRegistroDto = {
+    it('should create a record and return 201', async () => {
+      const createRecordDto = {
         admissionDate: '2024-01-15',
         salary: 5000,
         employee: 'John Doe',
@@ -66,9 +66,9 @@ describe('RegistrosController', () => {
 
       jest.spyOn(service, 'create').mockResolvedValue(expectedRegistro);
 
-      await controller.create(createRegistroDto, mockResponse);
+      await controller.create(createRecordDto, mockResponse);
 
-      expect(service.create).toHaveBeenCalledWith(createRegistroDto);
+      expect(service.create).toHaveBeenCalledWith(createRecordDto);
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
       expect(mockResponse.send).toHaveBeenCalled();
     });
@@ -154,12 +154,12 @@ describe('RegistrosController', () => {
     });
 
     it('should throw error when registro not found', async () => {
-      const error = new Error(ErrorMessages.REGISTRO_NOT_FOUND);
+      const error = new Error(ErrorMessages.RECORD_NOT_FOUND);
       jest.spyOn(service, 'findOne').mockResolvedValue([error, null]);
 
       await expect(
         controller.findOne('non-existent-id', mockResponse),
-      ).rejects.toThrow(ErrorMessages.REGISTRO_NOT_FOUND);
+      ).rejects.toThrow(ErrorMessages.RECORD_NOT_FOUND);
 
       expect(service.findOne).toHaveBeenCalledWith('non-existent-id');
     });
@@ -186,12 +186,12 @@ describe('RegistrosController', () => {
     });
 
     it('should throw error when registro not found for patch', async () => {
-      const error = new Error(ErrorMessages.REGISTRO_NOT_FOUND);
+      const error = new Error(ErrorMessages.RECORD_NOT_FOUND);
       jest.spyOn(service, 'patch').mockResolvedValue([error, null]);
 
       await expect(
         controller.patch('non-existent-id', { salary: 6000 }, mockResponse),
-      ).rejects.toThrow(ErrorMessages.REGISTRO_NOT_FOUND);
+      ).rejects.toThrow(ErrorMessages.RECORD_NOT_FOUND);
     });
   });
 
@@ -207,12 +207,12 @@ describe('RegistrosController', () => {
     });
 
     it('should throw error when registro not found for deletion', async () => {
-      const error = new Error(ErrorMessages.REGISTRO_NOT_FOUND);
+      const error = new Error(ErrorMessages.RECORD_NOT_FOUND);
       jest.spyOn(service, 'remove').mockResolvedValue([error, null]);
 
       await expect(
         controller.remove('non-existent-id', mockResponse),
-      ).rejects.toThrow(ErrorMessages.REGISTRO_NOT_FOUND);
+      ).rejects.toThrow(ErrorMessages.RECORD_NOT_FOUND);
     });
   });
 });

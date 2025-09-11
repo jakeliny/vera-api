@@ -3,10 +3,7 @@ import { RegistrosService } from './registros.service';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
 import { Registro } from './entities/registro.entity';
 import { ErrorMessages } from '../common/enums/error-messages.enum';
-import {
-  CreateRegistroDto,
-  UpdateRegistroDto,
-} from './dto/create-registro.dto';
+import { CreateRecordDto, UpdateRecordDto } from './dto/create-registro.dto';
 import { RegistroFilters } from './dto/filter-registro.dto';
 
 describe('RegistrosService', () => {
@@ -55,8 +52,8 @@ describe('RegistrosService', () => {
       jest.useRealTimers();
     });
 
-    it('should create a registro with calculated salary and admission date', async () => {
-      const createRegistroDto: CreateRegistroDto = {
+    it('should create a record with calculated salary and admission date', async () => {
+      const createRecordDto: CreateRecordDto = {
         admissionDate: '2024-01-15',
         salary: 5000,
         employee: 'John Doe',
@@ -73,7 +70,7 @@ describe('RegistrosService', () => {
 
       jest.spyOn(repository, 'insert').mockResolvedValue(expectedRegistro);
 
-      const result = await service.create(createRegistroDto);
+      const result = await service.create(createRecordDto);
 
       expect(repository.insert).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -81,14 +78,14 @@ describe('RegistrosService', () => {
           salary: 5000,
           calculatedSalary: 1750,
           employee: 'John Doe',
-          calculatedAdmissionDate: '5 dias',
+          calculatedAdmissionDate: '5 days',
         }),
       );
       expect(result).toEqual(expectedRegistro);
     });
 
     it('should calculate 35% of salary with 2 decimal places', async () => {
-      const createRegistroDto: CreateRegistroDto = {
+      const createRecordDto: CreateRecordDto = {
         admissionDate: '2024-01-15',
         salary: 1357,
         employee: 'Jane Smith',
@@ -99,7 +96,7 @@ describe('RegistrosService', () => {
         .spyOn(repository, 'insert')
         .mockImplementation(async (registro) => registro);
 
-      await service.create(createRegistroDto);
+      await service.create(createRecordDto);
 
       expect(repository.insert).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -134,7 +131,7 @@ describe('RegistrosService', () => {
       expect(result[0]).toEqual(
         expect.objectContaining({
           ...registros[0],
-          calculatedAdmissionDate: '5 dias',
+          calculatedAdmissionDate: '5 days',
         }),
       );
     });
@@ -175,7 +172,7 @@ describe('RegistrosService', () => {
       expect(result).toEqual(
         expect.objectContaining({
           ...registro,
-          calculatedAdmissionDate: '5 dias',
+          calculatedAdmissionDate: '5 days',
         }),
       );
     });
@@ -186,7 +183,7 @@ describe('RegistrosService', () => {
       const [error, result] = await service.findOne('non-existent-id');
 
       expect(error).toBeInstanceOf(Error);
-      expect(error?.message).toBe(ErrorMessages.REGISTRO_NOT_FOUND);
+      expect(error?.message).toBe(ErrorMessages.RECORD_NOT_FOUND);
       expect(result).toBeNull();
     });
   });
@@ -209,7 +206,7 @@ describe('RegistrosService', () => {
         'John Doe',
         'test-id',
       );
-      const updateData: UpdateRegistroDto = { salary: 6000 };
+      const updateData: UpdateRecordDto = { salary: 6000 };
       const updatedRegistro = {
         ...existingRegistro,
         salary: 6000,
@@ -225,7 +222,7 @@ describe('RegistrosService', () => {
       expect(result).toEqual(
         expect.objectContaining({
           ...updatedRegistro,
-          calculatedAdmissionDate: '5 dias',
+          calculatedAdmissionDate: '5 days',
         }),
       );
       expect(repository.put).toHaveBeenCalledWith('test-id', {
@@ -274,7 +271,7 @@ describe('RegistrosService', () => {
       });
 
       expect(error).toBeInstanceOf(Error);
-      expect(error?.message).toBe(ErrorMessages.REGISTRO_NOT_FOUND);
+      expect(error?.message).toBe(ErrorMessages.RECORD_NOT_FOUND);
       expect(result).toBeNull();
     });
   });
@@ -295,7 +292,7 @@ describe('RegistrosService', () => {
       const [error, result] = await service.remove('non-existent-id');
 
       expect(error).toBeInstanceOf(Error);
-      expect(error?.message).toBe(ErrorMessages.REGISTRO_NOT_FOUND);
+      expect(error?.message).toBe(ErrorMessages.RECORD_NOT_FOUND);
       expect(result).toBeNull();
     });
   });
