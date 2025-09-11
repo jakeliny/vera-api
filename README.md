@@ -1,144 +1,145 @@
 # V.E.R.A — Valor Efetivo de Renda Analisada
 
-V.E.R.A é um acrônimo para **Valor Efetivo de Renda Analisada**, um serviço que processa a renda e o tempo de trabalho de um profissional para embasar análises de crédito. O projeto foi desenvolvido com foco em demonstrar **padrões de arquitetura limpa, flexibilidade de persistência e qualidade de código**, pilares essenciais em uma aplicação de back-end.
+V.E.R.A is an acronym for **Valor Efetivo de Renda Analisada** (Effective Analyzed Income Value), a service that processes a professional's income and work time to support credit analysis. The project was developed with a focus on demonstrating **clean architecture patterns, persistence flexibility, and code quality**, which are essential pillars of a back-end application.
 
-## Visão Geral do Projeto
+## Project Overview
 
-Esta aplicação é uma API REST desenvolvida em **NestJS** que gerencia registros de funcionários, calculando automaticamente valores de salário e tempo de trabalho. O grande diferencial do projeto é a flexibilidade, permitindo alternar facilmente entre persistência em memória para desenvolvimento rápido e **MongoDB** para produção, utilizando uma arquitetura modular e aderente aos princípios **SOLID**.
+This application is a REST API developed in **NestJS** that manages employee records, automatically calculating salary values and work time. The project's main differentiator is its flexibility, allowing it to easily switch between in-memory persistence for rapid development and **MongoDB** for production, using a modular architecture that adheres to **SOLID** principles.
 
-## Stack de Tecnologias
+## Technology Stack
 
 - **Backend**: Node.js, TypeScript, NestJS
-- **Banco de Dados**: MongoDB (com Mongoose ODM)
-- **Containerização**: Docker & Docker Compose
-- **Persistência**: Padrão de Repositório com estratégia dupla (In-Memory / MongoDB)
-- **Validação**: Esquemas Zod com decorators customizados
-- **Documentação da API**: Swagger/OpenAPI
+- **Database**: MongoDB (with Mongoose ODM)
+- **Containerization**: Docker & Docker Compose
+- **Persistence**: Repository Pattern with a dual strategy (In-Memory / MongoDB)
+- **Validation**: Zod schemas with custom decorators
+- **API Documentation**: Swagger/OpenAPI
 
-## Arquitetura do Projeto
+## Project Architecture
 
-### Estrutura de Arquivos
+### File Structure
 
 ```
 src/
-├── common/           # Utilitários e infraestrutura compartilhados
-│ ├── decorators/     # Decorators personalizados (ZodBody)
-│ ├── enums/          # Enums para toda a aplicação
-│ ├── filters/        # Tratamento global de exceções
-│ └── utils/          # Funções utilitárias (data, salário)
-├── registros/        # Módulo de domínio principal
-│ ├── dto/            # Data Transfer Objects
-│ ├── entities/       # Entidades de domínio
-│ ├── interfaces/     # Contratos de Repository
-│ ├── repositories/   # Implementações de acesso a dados
-│ ├── schemas/        # Schemas do MongoDB
-│ └── swagger/        # Documentação da API
-├── app.module.ts     # Módulo raiz
-└── main.ts           # Ponto de entrada da aplicação
+├── common/ # Shared utilities and infrastructure
+│ ├── decorators/ # Custom decorators (ZodBody)
+│ ├── enums/ # Enums for the entire application
+│ ├── filters/ # Global exception handling
+│ └── utils/ # Utility functions (date, salary)
+├── registros/ # Main domain module
+│ ├── dto/ # Data Transfer Objects
+│ ├── entities/ # Domain entities
+│ ├── interfaces/ # Repository contracts
+│ ├── repositories/ # Data access implementations
+│ ├── schemas/ # MongoDB schemas
+│ └── swagger/ # API documentation
+├── app.module.ts # Root module
+└── main.ts # Application entry point
+
 ```
 
-## Componentes Principais
+## Main Components
 
 ### Entities
 
-- **Registro**: Entidade de domínio que representa os registros de funcionários
-  - Contém lógica de negócio no construtor
-  - Gera UUID automaticamente
-  - Encapsula campos calculados
+- **Registro**: Domain entity that represents employee records
+  - Contains business logic in the constructor
+  - Automatically generates UUID
+  - Encapsulates calculated fields
 
-### DTOs e Validações
+### DTOs and Validations
 
-- **Input Validation**: Schemas Zod para validação em tempo de execução
-- **DTO Classes**: Classes DTOs separadas para operações de Create/Update
-- **Swagger DTOs**: Classes dedicadas para a documentação da API
-- **Custom Decorator**: `@ZodBody` para validação de requisição
+- **Input Validation**: Zod schemas for runtime validation
+- **DTO Classes**: Separate DTO classes for Create/Update operations
+- **Swagger DTOs**: Dedicated classes for API documentation
+- **Custom Decorator**: `@ZodBody` for request validation
 
 ### Repository Pattern
 
-- **Interface**: `IRegistrosRepository` define o contrato
-- **Implementações**:
-  - `MongoRegistrosRepository`: Persistência em produção com MongoDB
-  - `InMemoryRegistrosRepository`: Para testes e desenvolvimento
-- **Dynamic Selection**: O Repository é escolhido com base na configuração do ambiente
+- **Interface**: `IRegistrosRepository` defines the contract
+- **Implementations**:
+  - `MongoRegistrosRepository`: Production persistence with MongoDB
+  - `InMemoryRegistrosRepository`: For testing and development
+- **Dynamic Selection**: The Repository is chosen based on the environment configuration
 
 ### Service Layer
 
-- **RegistrosService**: Orquestração da lógica de negócio
-  - Cálculos de salário (regra dos 35%)
-  - Cálculos de tempo decorrido da data
-  - Tratamento de erro com retornos de tupla `[Error, Result]`
-  - Abstração do Repository através de dependency injection
+- **RegistrosService**: Business logic orchestration
+  - Salary calculations (35% rule)
+  - Elapsed time calculations from the date
+  - Error handling with `[Error, Result]` tuple returns
+  - Repository abstraction through dependency injection
 
 ### Controller Layer
 
-- **RegistrosController**: Tratamento de requisições HTTP
-  - Endpoints RESTful (operações CRUD)
-  - Análise de query parameters para filtragem
-  - Suporte a pagination
-  - Formatação de resposta
+- **RegistrosController**: HTTP request handling
+  - RESTful endpoints (CRUD operations)
+  - Query parameter analysis for filtering
+  - Pagination support
+  - Response formatting
 
-## Padrões de Key Design
+## Key Design Patterns
 
 ### Dependency Injection
 
-- Injeção baseada em interface para os repositories
-- Padrão de Factory para seleção dinâmica do repository
-- Troca de provider baseada em configuração
+- Interface-based injection for repositories
+- Factory pattern for dynamic repository selection
+- Provider swapping based on configuration
 
 ### Error Handling
 
-- Filtro de exceção global com processamento de erro centralizado
-- Tradução de erros de validação Zod
-- Formato de resposta de erro consistente
-- Mensagens de erro internacionalizadas
+- Global exception filter with centralized error processing
+- Translation of Zod validation errors
+- Consistent error response format
+- Internationalized error messages
 
-### Fluxo de Dados
+### Data Flow
 
-1. Requisição → Controller (validação via ZodBody)
-2. Controller → Service (lógica de negócio)
-3. Service → Repository (persistência de dados)
+1. Request → Controller (validation via ZodBody)
+2. Controller → Service (business logic)
+3. Service → Repository (data persistence)
 4. Repository → Database/Memory
-5. Transformação da resposta e retorno
+5. Response transformation and return
 
-## Gerenciamento de Configuração
+## Configuration Management
 
-- Configuração baseada em ambiente via ConfigModule
-- Conexão de banco de dados dinâmica (MongoDB ou in-memory)
-- Configuração de CORS baseada no ambiente
-- Configuração de porta com fallback
+- Environment-based configuration via ConfigModule
+- Dynamic database connection (MongoDB or in-memory)
+- CORS configuration based on the environment
+- Port configuration with fallback
 
-## Recursos da API
+## API Features
 
-- **Pagination**: Tamanho da página e ordenação configuráveis
-- **Filtering**: Suporte a filtragem de múltiplos campos
-- **Sorting**: Ordenação de campo dinâmica (asc/desc)
-- **Validation**: Validação de requisição com mensagens de erro detalhadas
-- **Documentation**: Swagger UI gerado automaticamente
+- **Pagination**: Configurable page size and sorting
+- **Filtering**: Support for filtering multiple fields
+- **Sorting**: Dynamic field sorting (asc/desc)
+- **Validation**: Request validation with detailed error messages
+- **Documentation**: Automatically generated Swagger UI
 
-## Funções Utilitárias
+## Utility Functions
 
-- **DateUtils**: Cálculos de tempo decorrido
-- **SalaryUtils**: Cálculos de salário baseados em porcentagem
-- **Error Translations**: Mensagens de erro internacionalizadas
+- **DateUtils**: Elapsed time calculations
+- **SalaryUtils**: Percentage-based salary calculations
+- **Error Translations**: Internationalized error messages
 
-## Pré-requisitos
+## Prerequisites
 
 - Node.js >= 18
 - pnpm >= 8
-- Docker & Docker Compose (para configuração com MongoDB)
+- Docker & Docker Compose (for MongoDB setup)
 
-## Instalação e Configuração
+## Installation and Configuration
 
 ```bash
-# Instalar dependências
+# Install dependencies
 pnpm install
 ```
 
-### Variáveis de Ambiente
+### Environment Variables
 
-A aplicação suporta dois modos de persistência, controlados pela variável de ambiente `USE_DATABASE`.
+The application supports two persistence modes, controlled by the USE_DATABASE environment variable.
 
-Copie o arquivo `.env.example` na raiz do projeto e crie um arquivo `.env`:
+Copy the .env.example file from the project root and create a .env file:
 
 ```
 NODE_ENV=
@@ -151,196 +152,197 @@ MONGO_DATABASE=
 MONGODB_URI=
 ```
 
-- `USE_DATABASE=false`: Utiliza o repositório em memória.
+- USE_DATABASE=false: Uses the in-memory repository.
+- USE_DATABASE=true: Uses the MongoDB repository.
 
-- `USE_DATABASE=true`: Utiliza o repositório MongoDB.
+## How to Run the Application
 
-## Como Executar a Aplicação
+### Option 1: Local Development (In-Memory)
 
-### Opção 1: Desenvolvimento Local (In-Memory)
-
-Ideal para desenvolvimento rápido e testes sem dependências externas.
+Ideal for quick development and testing without external dependencies.
 
 ```bash
-
-# Garantir USE_DATABASE=false no .env
+# Ensure USE_DATABASE=false in .env
 echo "USE_DATABASE=false" >> .env
 
-# Executar em modo desenvolvimento
+# Run in development mode
 pnpm start:dev
 ```
 
-**Características:**
+**Features:**
 
-- Sem dependências externas.
-- Inicialização rápida.
-- Os dados não são persistidos, sendo reiniciados a cada `restart`.
+- No external dependencies.
+- Fast startup.
+- Data is not persisted and is reset with each `restart`.
 
-### Opção 2: Configuração de Produção (MongoDB com Docker)
+### Option 2: Production Configuration (MongoDB with Docker)
 
-Recomendado para ambientes que necessitam de armazenamento persistente.
+Recommended for environments that require persistent storage.
 
-```bash
-
-# Iniciar containers da aplicação e do banco de dados
+```
+# Start the application and database containers
 pnpm dev:start
 
-# Visualizar logs
+# View logs
 pnpm dev:logs
 
-# Parar os containers
+# Stop the containers
 pnpm dev:stop
 ```
 
-**Características:**
+**Features:**
 
-- Armazenamento persistente de dados.
-- Configuração pronta para ser replicada em produção.
-- Conexão automática com o banco de dados.
+- Persistent data storage.
+- Ready-to-replicate configuration for production.
+- Automatic database connection.
 
-## Scripts Principais
+## Main Scripts
 
-| Script            | Descrição                                        |
-| :---------------- | :----------------------------------------------- |
-| `pnpm dev:start`  | Inicia ambiente completo com Docker Compose      |
-| `pnpm start:dev`  | Executa aplicação localmente (em memória)        |
-| `pnpm start:prod` | Executa aplicação localmente em modo de produção |
-| `pnpm test`       | Executa testes unitários                         |
-| `pnpm test:cov`   | Executa testes com relatório de cobertura        |
-| `pnpm test:e2e`   | Executa testes end-to-end                        |
+| Script            | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| `pnpm dev:start`  | Starts the complete environment with Docker Compose |
+| `pnpm start:dev`  | Runs the application locally (in-memory)            |
+| `pnpm start:prod` | Runs the application locally in production mode     |
+| `pnpm test`       | Runs unit tests                                     |
+| `pnpm test:cov`   | Runs tests with a coverage report                   |
+| `pnpm test:e2e`   | Runs end-to-end tests                               |
 
-## Documentação e Endpoints da API
+## API Documentation and Endpoints
 
-Uma vez em execução, a documentação interativa da API está disponível no **Swagger UI**:
+Once running, the interactive API documentation is available at Swagger UI:
 
 > http://localhost:3000/api
 
-### Endpoints Principais
+### Main Endpoints
 
-| Método | Endpoint         | Descrição                 |
-| :----- | :--------------- | :------------------------ |
-| POST   | `/registros`     | Criar um novo registro    |
-| GET    | `/registros`     | Listar todos os registros |
-| GET    | `/registros/:id` | Buscar um registro por ID |
-| PUT    | `/registros/:id` | Atualizar um registro     |
-| DELETE | `/registros/:id` | Deletar um registro       |
+| Method | Endpoint         | Description         |
+| ------ | ---------------- | ------------------- |
+| POST   | `/registros`     | Create a new record |
+| GET    | `/registros`     | List all records    |
+| GET    | `/registros/:id` | Find a record by ID |
+| PUT    | `/registros/:id` | Update a record     |
+| DELETE | `/registros/:id` | Delete a record     |
 
-## Testes
+## Tests
 
-### Execução de Testes
+### Running Tests
 
 ```bash
-# Testes unitários
+# Unit tests
 pnpm test
 
-# Testes end-to-end
+# End-to-end tests
 pnpm test:e2e
-
-# Relatório de cobertura
+# Coverage report
 pnpm test:cov
 
-# Modo watch para desenvolvimento
+# Watch mode for development
 pnpm test:watch
 ```
 
-### Teste de Persistência de Dados
+### Data Persistence Testing
 
-#### Testando Modo In-Memory
+#### Testing In-Memory Mode
 
 ```bash
-# 1. Garantir USE_DATABASE=false no .env
-# 2. Iniciar a aplicação
+# 1. Ensure USE_DATABASE=false in .env
+echo "USE_DATABASE=false" >> .env
+
+# 2. Start the application
 pnpm start:dev
 
-# 3. Criar um registro
+# 3. Create a record
 curl -X POST http://localhost:3000/registros \
-  -H "Content-Type: application/json" \
-  -d '{"employee": "Test User", "admissionDate": "2024-01-01", "salary": 4000}'
+ -H "Content-Type: application/json" \
+ -d '{"employee": "Test User", "admissionDate": "2024-01-01", "salary": 4000}'
 
-# 4. Verificar se registro existe
+# 4. Verify that the record exists
 curl -X GET http://localhost:3000/registros
 
-# 5. Reiniciar aplicação (Ctrl+C e executar novamente)
-# 6. Verificar registros (devem estar vazios - dados não persistidos)
+# 5. Restart the application (Ctrl+C and run again)
+
+# 6. Check records (should be empty - data is not persisted)
 curl -X GET http://localhost:3000/registros
 ```
 
-#### Testando Persistência MongoDB
+#### Testing MongoDB Persistence
 
 ```bash
-# 1. Iniciar com Docker Compose
+# 1. Start with Docker Compose
 pnpm dev:start
 
-# 2. Criar um registro
+# 2. Create a record
 curl -X POST http://localhost:3000/registros \
-  -H "Content-Type: application/json" \
-  -d '{"employee": "Persistent User", "admissionDate": "2024-01-01", "salary": 5500}'
+ -H "Content-Type: application/json" \
+ -d '{"employee": "Persistent User", "admissionDate": "2024-01-01", "salary": 5500}'
 
-# 3. Verificar se registro existe
+# 3. Verify that the record exists
 curl -X GET http://localhost:3000/registros
 
-# 4. Reiniciar containers
+# 4. Restart containers
 pnpm dev:restart
 
-# 5. Verificar registros (devem ainda existir - dados persistidos no MongoDB)
+# 5. Check records (should still exist - data is persisted in MongoDB)
 curl -X GET http://localhost:3000/registros
+
 ```
 
-## Qualidade do Código
+## Code Quality
 
 ```bash
-# Verificar código
+# Check code
 pnpm lint
 
-# Formatar código
+# Format code
 pnpm format
 
-# Compilar aplicação
+# Compile application
 pnpm build
 ```
 
-## Comandos Docker
+## Docker Commands
 
-### Gerenciamento da Aplicação
+### Application Management
 
 ```bash
-# Compilar e iniciar todos os serviços
+# Build and start all services
 pnpm dev:start
 
-# Iniciar apenas serviço específico
+# Start only a specific service
 docker-compose up mongodb
 
-# Visualizar logs do serviço
+# View service logs
 pnpm dev:logs
 
-# Executar comandos em container em execução
+# Run commands in a running container
 docker-compose exec app pnpm test
 
-# Limpeza completa de volumes e redes
+# Complete cleanup of volumes and networks
 pnpm dev:stop --volumes --remove-orphans
 ```
 
-### Gerenciamento do Banco de Dados
+### Database Management
 
 ```bash
-# Conectar ao container MongoDB
+# Connect to the MongoDB container
 docker-compose exec mongodb mongosh -u admin -p password123 --authenticationDatabase admin
 
-# Backup do banco de dados
+# Database backup
 docker-compose exec mongodb mongodump --uri="mongodb://admin:password123@localhost:27017/vera_db?authSource=admin" --out=/backup
 
-# Visualizar coleções do banco
+# View database collections
+
 docker-compose exec mongodb mongosh -u admin -p password123 --authenticationDatabase admin --eval "use vera_db; show collections"
 ```
 
-## Padrão de trabalho
+## Workflow
 
-1. Crie uma branch de funcionalidade
-2. Faça suas alterações
-3. Adicione testes para nova funcionalidade
-4. Certifique-se que todos os testes passam
-5. Envie um pull request
+1. Create a feature branch
+2. Make your changes
+3. Add tests for the new functionality
+4. Ensure all tests pass
+5. Submit a pull request
 
-## Licença
+## License
 
-Este projeto está licenciado sob a Licença MIT.
+This project is licensed under the MIT License.
