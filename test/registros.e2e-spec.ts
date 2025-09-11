@@ -70,7 +70,7 @@ describe('RegistrosController (e2e)', () => {
         .expect(400)
         .expect((res) => {
           expect(res.body.message).toBe(
-            'Data de admissão não pode ser no futuro',
+            'Admission date cannot be in the future',
           );
         });
     });
@@ -87,7 +87,7 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Salário deve ser um número positivo');
+          expect(res.body.message).toBe('Salary must be positive');
         });
     });
 
@@ -103,7 +103,7 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe('Salário não pode exceder 100.000');
+          expect(res.body.message).toBe('Salary cannot exceed 100,000');
         });
     });
 
@@ -121,7 +121,7 @@ describe('RegistrosController (e2e)', () => {
         .expect(400)
         .expect((res) => {
           expect(res.body.message).toBe(
-            'Nome do funcionário não pode exceder 30 caracteres',
+            'Employee name cannot exceed 30 characters',
           );
         });
     });
@@ -138,9 +138,7 @@ describe('RegistrosController (e2e)', () => {
         .send(createRegistroDto)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toBe(
-            'Data deve estar no formato AAAA-MM-DD',
-          );
+          expect(res.body.message).toBe('Date must be in YYYY-MM-DD format');
         });
     });
   });
@@ -198,7 +196,7 @@ describe('RegistrosController (e2e)', () => {
         .get('/registros/non-existent-id')
         .expect(404)
         .expect((res) => {
-          expect(res.body.message).toBe('Registro não encontrado');
+          expect(res.body.message).toBe('Record not found');
         });
     });
 
