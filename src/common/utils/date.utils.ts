@@ -19,14 +19,14 @@ export class DateUtils {
     }
 
     const parts = [];
-    if (days > 0) parts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
-    if (months > 0) parts.push(`${months} ${months === 1 ? 'mês' : 'meses'}`);
-    if (years > 0) parts.push(`${years} ${years === 1 ? 'ano' : 'anos'}`);
+    if (days > 0) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+    if (months > 0) parts.push(`${months} ${months === 1 ? 'month' : 'months'}`);
+    if (years > 0) parts.push(`${years} ${years === 1 ? 'year' : 'years'}`);
 
-    if (parts.length === 0) return '0 dias';
+    if (parts.length === 0) return '0 days';
     if (parts.length === 1) return parts[0];
-    if (parts.length === 2) return `${parts[0]} e ${parts[1]}`;
+    if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
 
-    return `${parts[0]}, ${parts[1]} e ${parts[2]}`;
+    return `${parts[0]}, ${parts[1]} and ${parts[2]}`;
   }
 }

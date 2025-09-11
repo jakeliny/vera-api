@@ -13,10 +13,10 @@ import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { ZodBody } from '../common/decorators/zod-body.decorator';
 import {
-  CreateRegistroDto,
-  CreateRegistroSchema,
-  UpdateRegistroDto,
-  UpdateRegistroSchema,
+  CreateRecordDto,
+  CreateRecordSchema,
+  UpdateRecordDto,
+  UpdateRecordSchema,
 } from './dto/create-registro.dto';
 import { RegistrosService } from './registros.service';
 import { RegistroFilters, PaginationParams } from './dto/filter-registro.dto';
@@ -36,10 +36,10 @@ export class RegistrosController {
   @Post()
   @CreateRegistroSwagger()
   async create(
-    @ZodBody(CreateRegistroSchema) createRegistroDto: CreateRegistroDto,
+    @ZodBody(CreateRecordSchema) createRecordDto: CreateRecordDto,
     @Res() res: Response,
   ) {
-    await this.registrosService.create(createRegistroDto);
+    await this.registrosService.create(createRecordDto);
     return res.status(HttpStatus.CREATED).send();
   }
 
@@ -103,10 +103,10 @@ export class RegistrosController {
   @UpdateRegistroSwagger()
   async patch(
     @Param('id') id: string,
-    @ZodBody(UpdateRegistroSchema) updateRegistroDto: UpdateRegistroDto,
+    @ZodBody(UpdateRecordSchema) updateRecordDto: UpdateRecordDto,
     @Res() res: Response,
   ) {
-    const [error] = await this.registrosService.patch(id, updateRegistroDto);
+    const [error] = await this.registrosService.patch(id, updateRecordDto);
 
     if (error) {
       throw error;

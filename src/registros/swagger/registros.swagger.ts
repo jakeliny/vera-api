@@ -7,25 +7,25 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import {
-  CreateRegistroSwaggerDto,
-  UpdateRegistroSwaggerDto,
+  CreateRecordSwaggerDto,
+  UpdateRecordSwaggerDto,
 } from '../dto/create-registro.dto';
 
-export const REGISTRO_EXAMPLES = {
+export const RECORD_EXAMPLES = {
   createRequest: {
     admissionDate: '2023-01-15',
     salary: 5000,
-    employee: 'João Silva',
+    employee: 'John Silva',
   },
 
-  registroResponse: {
+  recordResponse: {
     id: '550e8400-e29b-41d4-a716-446655440000',
     admissionDate: '2023-01-15',
     salary: 5000,
     calculatedSalary: 1750.0,
-    employee: 'João Silva',
+    employee: 'John Silva',
     createdAt: '2024-01-15T10:30:00.000Z',
-    calculatedAdmissionDate: '10 dias, 2 meses e 1 ano',
+    calculatedAdmissionDate: '10 days, 2 months and 1 year',
   },
 
   updateRequest: {
@@ -33,11 +33,11 @@ export const REGISTRO_EXAMPLES = {
       salary: 6000,
     },
     employee: {
-      employee: 'Maria Santos',
+      employee: 'Mary Santos',
     },
     multiple: {
       salary: 7000,
-      employee: 'Pedro Costa',
+      employee: 'Peter Costa',
       admissionDate: '2023-06-01',
     },
   },
@@ -47,22 +47,22 @@ export const REGISTRO_EXAMPLES = {
     admissionDate: '2023-06-01',
     salary: 7000,
     calculatedSalary: 2450.0,
-    employee: 'Pedro Costa',
+    employee: 'Peter Costa',
     createdAt: '2024-01-15T10:30:00.000Z',
-    calculatedAdmissionDate: '15 dias e 8 meses',
+    calculatedAdmissionDate: '15 days and 8 months',
   },
 };
 
 export const ERROR_RESPONSES = {
   notFound: {
     status: 404,
-    message: 'Registro não encontrado',
+    message: 'Record not found',
     timeStamp: '2024-01-15 10:30:00',
   },
 
   badRequest: {
     status: 400,
-    message: 'Salário deve ser no mínimo 1300',
+    message: 'Salary must be at least 1300',
     timeStamp: '2024-01-15 10:30:00',
   },
 };
@@ -95,12 +95,12 @@ export const CreateRegistroSwagger = () =>
         'Creates a new employee registry entry with salary calculations',
     }),
     ApiBody({
-      type: CreateRegistroSwaggerDto,
+      type: CreateRecordSwaggerDto,
       description: 'Registry data',
       examples: {
         example1: {
           summary: 'Standard employee entry',
-          value: REGISTRO_EXAMPLES.createRequest,
+          value: RECORD_EXAMPLES.createRequest,
         },
       },
     }),
@@ -189,7 +189,7 @@ export const GetAllRegistrosSwagger = () =>
           page: 0,
           totalPages: 4,
           limit: 8,
-          data: [REGISTRO_EXAMPLES.registroResponse],
+          data: [RECORD_EXAMPLES.recordResponse],
         },
       },
     }),
@@ -205,7 +205,7 @@ export const GetRegistroByIdSwagger = () =>
     ApiResponse({
       status: 200,
       description: 'Registry found',
-      schema: { example: REGISTRO_EXAMPLES.registroResponse },
+      schema: { example: RECORD_EXAMPLES.recordResponse },
     }),
     commonResponses.notFound,
   );
@@ -218,20 +218,20 @@ export const UpdateRegistroSwagger = () =>
     }),
     idParam,
     ApiBody({
-      type: UpdateRegistroSwaggerDto,
+      type: UpdateRecordSwaggerDto,
       description: 'Updated registry data (partial)',
       examples: {
         example1: {
           summary: 'Update salary',
-          value: REGISTRO_EXAMPLES.updateRequest.salary,
+          value: RECORD_EXAMPLES.updateRequest.salary,
         },
         example2: {
           summary: 'Update employee name',
-          value: REGISTRO_EXAMPLES.updateRequest.employee,
+          value: RECORD_EXAMPLES.updateRequest.employee,
         },
         example3: {
           summary: 'Update multiple fields',
-          value: REGISTRO_EXAMPLES.updateRequest.multiple,
+          value: RECORD_EXAMPLES.updateRequest.multiple,
         },
       },
     }),

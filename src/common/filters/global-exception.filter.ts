@@ -7,10 +7,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ZodError } from 'zod';
-import {
-  ErrorMessages,
-  ERROR_TRANSLATIONS,
-} from '../enums/error-messages.enum';
+import { ErrorMessages } from '../enums/error-messages.enum';
 
 export interface ErrorResponse {
   status: number;
@@ -28,16 +25,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const timeStamp = now.toISOString().replace('T', ' ').substring(0, 19);
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = String(
-      ERROR_TRANSLATIONS[ErrorMessages.INTERNAL_SERVER_ERROR],
-    );
+    let message: string = ErrorMessages.INTERNAL_SERVER_ERROR;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
       if (typeof exceptionResponse === 'string') {
-        message = this.translateMessage(exceptionResponse);
+        message = exceptionResponse;
       } else if (
         typeof exceptionResponse === 'object' &&
         exceptionResponse !== null
@@ -45,20 +40,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         const responseObj = exceptionResponse as any;
         if (responseObj.message) {
           if (Array.isArray(responseObj.message)) {
-            message = this.translateMessage(responseObj.message[0]);
+            message = responseObj.message[0];
           } else {
-            message = this.translateMessage(responseObj.message);
+            message = responseObj.message;
           }
         }
       }
     } else if (exception instanceof ZodError) {
       status = HttpStatus.BAD_REQUEST;
       const firstError = exception.issues[0];
-      message = this.translateZodError(firstError);
+      message = firstError.message || ErrorMessages.VALIDATION_ERROR;
     } else if (exception instanceof Error) {
-      message = this.translateMessage(exception.message);
+      message = exception.message;
 
-      if (exception.message === ErrorMessages.REGISTRO_NOT_FOUND) {
+      if (exception.message === ErrorMessages.RECORD_NOT_FOUND) {
         status = HttpStatus.NOT_FOUND;
       } else {
         status = HttpStatus.BAD_REQUEST;
@@ -72,16 +67,5 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     };
 
     response.status(status).json(errorResponse);
-  }
-
-  private translateMessage(message: string): string {
-    const errorMessage = message as ErrorMessages;
-    const translation = ERROR_TRANSLATIONS[errorMessage];
-    return translation ? String(translation) : message;
-  }
-
-  private translateZodError(error: any): string {
-    const errorMessage = error.message || ErrorMessages.VALIDATION_ERROR;
-    return this.translateMessage(String(errorMessage));
   }
 }

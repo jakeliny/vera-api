@@ -1,8 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  CreateRegistroDto,
-  UpdateRegistroDto,
-} from './dto/create-registro.dto';
+import { CreateRecordDto, UpdateRecordDto } from './dto/create-registro.dto';
 import { Registro } from './entities/registro.entity';
 import { IRegistrosRepository } from './interfaces/registros-repository.interface';
 import { DateUtils } from '../common/utils/date.utils';
@@ -21,20 +18,20 @@ export class RegistrosService {
     private readonly registrosRepository: IRegistrosRepository,
   ) {}
 
-  async create(createRegistroDto: CreateRegistroDto): Promise<Registro> {
+  async create(createRecordDto: CreateRecordDto): Promise<Registro> {
     const calculatedSalary = SalaryUtils.calculateSalaryPercentage(
-      createRegistroDto.salary,
+      createRecordDto.salary,
       35,
     );
     const calculatedAdmissionDate = DateUtils.calculateElapsedTime(
-      createRegistroDto.admissionDate,
+      createRecordDto.admissionDate,
     );
 
     const registro = new Registro(
-      createRegistroDto.admissionDate,
-      createRegistroDto.salary,
+      createRecordDto.admissionDate,
+      createRecordDto.salary,
       calculatedSalary,
-      createRegistroDto.employee,
+      createRecordDto.employee,
       undefined,
       calculatedAdmissionDate,
     );
@@ -75,7 +72,7 @@ export class RegistrosService {
     const registro = await this.registrosRepository.getById(id);
 
     if (!registro) {
-      return [new Error(ErrorMessages.REGISTRO_NOT_FOUND), null];
+      return [new Error(ErrorMessages.RECORD_NOT_FOUND), null];
     }
 
     const registroWithCalculatedDate = {
@@ -90,19 +87,19 @@ export class RegistrosService {
 
   async patch(
     id: string,
-    updateData: UpdateRegistroDto,
+    updateData: UpdateRecordDto,
   ): Promise<[Error, null] | [null, Registro]> {
     const existingRegistro = await this.registrosRepository.getById(id);
 
     if (!existingRegistro) {
-      return [new Error(ErrorMessages.REGISTRO_NOT_FOUND), null];
+      return [new Error(ErrorMessages.RECORD_NOT_FOUND), null];
     }
 
     const allowedFields = ['employee', 'salary', 'admissionDate'];
     const filteredUpdateData = Object.keys(updateData)
       .filter((key) => allowedFields.includes(key))
       .reduce((obj, key) => {
-        obj[key] = updateData[key as keyof UpdateRegistroDto];
+        obj[key] = updateData[key as keyof UpdateRecordDto];
         return obj;
       }, {} as any);
 
@@ -121,7 +118,7 @@ export class RegistrosService {
     });
 
     if (!updatedRegistro) {
-      return [new Error(ErrorMessages.FAILED_TO_UPDATE_REGISTRO), null];
+      return [new Error(ErrorMessages.FAILED_TO_UPDATE_RECORD), null];
     }
 
     const registroWithCalculatedDate = {
@@ -138,7 +135,7 @@ export class RegistrosService {
     const deleted = await this.registrosRepository.delete(id);
 
     if (!deleted) {
-      return [new Error(ErrorMessages.REGISTRO_NOT_FOUND), null];
+      return [new Error(ErrorMessages.RECORD_NOT_FOUND), null];
     }
 
     return [null, deleted] as [null, boolean];

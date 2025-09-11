@@ -7,7 +7,7 @@ const salary = {
   maximum: 100000,
 };
 
-export const CreateRegistroSchema = z.object({
+export const CreateRecordSchema = z.object({
   admissionDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, ErrorMessages.DATE_FORMAT_INVALID)
@@ -28,7 +28,7 @@ export const CreateRegistroSchema = z.object({
     .max(30, ErrorMessages.EMPLOYEE_NAME_MAX_LENGTH),
 });
 
-export const UpdateRegistroSchema = z.object({
+export const UpdateRecordSchema = z.object({
   admissionDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, ErrorMessages.DATE_FORMAT_INVALID)
@@ -52,10 +52,10 @@ export const UpdateRegistroSchema = z.object({
     .optional(),
 });
 
-export type CreateRegistroDto = z.infer<typeof CreateRegistroSchema>;
-export type UpdateRegistroDto = z.infer<typeof UpdateRegistroSchema>;
+export type CreateRecordDto = z.infer<typeof CreateRecordSchema>;
+export type UpdateRecordDto = z.infer<typeof UpdateRecordSchema>;
 
-export class CreateRegistroSwaggerDto {
+export class CreateRecordSwaggerDto {
   @ApiProperty({
     description: 'Employee admission date in YYYY-MM-DD format',
     example: '2023-01-15',
@@ -73,14 +73,14 @@ export class CreateRegistroSwaggerDto {
 
   @ApiProperty({
     description: 'Employee name (1-30 characters)',
-    example: 'João Silva',
+    example: 'John Silva',
     minLength: 1,
     maxLength: 30,
   })
   employee: string;
 }
 
-export class UpdateRegistroSwaggerDto {
+export class UpdateRecordSwaggerDto {
   @ApiPropertyOptional({
     description: 'Employee admission date in YYYY-MM-DD format',
     example: '2023-01-15',
@@ -98,7 +98,7 @@ export class UpdateRegistroSwaggerDto {
 
   @ApiPropertyOptional({
     description: 'Employee name (1-30 characters)',
-    example: 'Maria Santos',
+    example: 'Mary Santos',
     minLength: 1,
     maxLength: 30,
   })
